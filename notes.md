@@ -20,6 +20,8 @@
   - The solution to this is to (probably) have separate 'topics' for cells vs packs, so that the microcontroller only needs to worry about SoC estimation on the *pack*, rather than on every single cell.
 - We are also going to need to come up with a naming nomenclature, so that we can easily serialize each data point
 
+## Actual Server 
+
 ## Nomenclature
 
 A minimum set of battery information on an initial device connection could be:
@@ -70,13 +72,16 @@ There will be one master database, stored in MongoDB, which will contain all of 
 
 ## For next meeting
 
-- Are we doing cell-based, or for a whole pack? It might be smart to do both?
-- We will need to discuss which BMS we are going to use for testing, since BMS's with serial might be expensive
-  - ie are we designing our own BMS or using a third party BMS?
-  - We could use MaxKGO for sensing, since this algorithm will be working with different companies' BMS's
-  - Alternatively, we can make our own BMS
-- If we use something like MaxKGO, since it is open source, we can (fairly easily) add our API to it, so that its SoC estimation can connect to our SoC estimation. 
-  - Lovelesh recommends this, since from his experience, providing a demo where we can show that our algorithm can be implemented into an existing platform is a product we can 'sell' to the community.
-  - Take existing hardware, and show that we can improve it.
-  - When we showcase this technology, if we use proprietary hardware, the initial reaction might be that we need special or extra hardware to implement our algorithm, which is not true
-  - If we can show a useable product, and **open-source** the product, then the product will grow very quickly, and we can become a sales platform, rather than a platform for the service
+### Status of Project
+
+- Last meeting, we determined that we are going to start by using our own custom data collection system, rather than using an existing BMS.
+- We have set up an email account and registered it with Amazon AWS
+  - Set up with Lambda, DynamoDB, and IoT Core
+  - IoT core is the broker mechanism; we got it responding to my server, so it is working
+
+### Questions
+
+- We need a credit card of some kind registered to the account, right now Cole's card is registered, but this cannot be permanent.
+- There is a Pi Zero 2 W in the lab, we have taken it for now for testing purposes, but we should check with Bala to make sure it is okay to use.
+- I need the battery simulation code that he made, so that I can simulate stuff for testing.
+- Ask about records off of Arbin that we can use to construct a training database for the neural network.
