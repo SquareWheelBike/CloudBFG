@@ -3,7 +3,8 @@
 ## Pi Login
 
 ```txt
-uname pi
+ssh `ssh cloudbfg@colef.club -p 444`
+uname cloudbfg
 passwd CloudBFG1181
 ```
 
