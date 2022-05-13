@@ -7,7 +7,7 @@
 - The ESP will have a buffer of entries to keep track of, so that socket connections are not so common.
 - Each recorded reading will also be buffered, so as to remove spikes and noise from readings
 - The ESP only needs to keep track of SOC characterization coefficients; these can be loaded from EEPROM and used for SOC instantaneously, independent from the server
-- The ESP will connect to the 'Broker', 
+- The ESP will connect to the 'Broker'
 
 ## Server
 
