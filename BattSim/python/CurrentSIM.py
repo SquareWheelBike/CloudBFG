@@ -72,7 +72,7 @@ def CurrentSIM(Iprofile = None,I1 = None,I2 = None,delta = None,T = None,D = Non
                     l = 1
                     I = Imag[0] * np.ones((T.size,1))
                     for k in np.arange(1,Nb * Np+1).reshape(-1):
-                        I[np.arange((k - 1) * Nsp2 + 1,k * Nsp2+1)] = Imag[l-1] * np.ones((Nsp2,1), float)
+                        I[(np.arange((k - 1) * Nsp2 + 1,k * Nsp2+1))-1] = Imag[l-1] * np.ones((Nsp2,1), float)
                         l = l + 1
                         if (l == Nb + 1):
                             l = 1
@@ -87,16 +87,16 @@ def CurrentSIM(Iprofile = None,I1 = None,I2 = None,delta = None,T = None,D = Non
                         if 'simulated dynamic' == Iprofile:
                             pass
     
-    if len(varargin) == 0:
-        close_('all')
-        figure
-        hold('on')
-        grid('on')
-        plt.plot(1000 * T,I,'-*')
-        plt.xlabel('Time(ms)')
-        plt.ylabel('Current (A)')
-        set(gca,'fontsize',14)
+    # if len(varargin) == 0:
+    #     close_('all')
+    #     figure
+    #     hold('on')
+    #     grid('on')
+    #     plt.plot(1000 * T,I,'-*')
+    #     plt.xlabel('Time(ms)')
+    #     plt.ylabel('Current (A)')
+    #     set(gca,'fontsize',14)
     
-    return T,I
+    # return T,I
     
     return T,I
