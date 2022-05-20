@@ -1,4 +1,5 @@
- %clc; close all; clear all;
+
+%clc; close all; clear all;
 
 % dbstop('error')
 
@@ -35,6 +36,7 @@ Batt.alpha2 = exp(-(delta/(Batt.R2*Batt.C2)));
 
 %current simulation
 [T,I] = CurretSIM('rectangularnew',-Id, Id, delta, Tc, D);
+% disp(T)
 
 %SNR and noise parameters
 SNR     = 50;
@@ -43,7 +45,7 @@ sigma_v = 10^(-SNR/20); % voltage measurement noise
 
 % send current into the batery simulater
 [Vbatt,Ibatt, ~, Vo] = battSIM(I, T, Batt, sigma_i, sigma_v, delta);
-
+disp([Vbatt,Ibatt, Vo])
 %current plotting
 % hI=figure; hold on; grid on; box on
 % subplot(211); box on; grid on

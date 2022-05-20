@@ -2,6 +2,12 @@
 
 # todo: add HTML responses? Perhaps we can use a local server to simulate batteries, so the pi doesn't have to simulate the battery
 
-from os import subprocess
-
-sp = subprocess(STDIN=stdin, STDOUT=stdout)
+import subprocess
+process = subprocess.Popen(['octave', 'demoBatterySimulator.m'],
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           stdin=subprocess.PIPE,
+                           universal_newlines=True,
+                           bufsize=0)
+stdout, stderr = process.communicate()
+print(stdout)
