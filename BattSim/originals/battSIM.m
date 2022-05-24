@@ -22,7 +22,7 @@ function [V, I, soc, Vo] = battSIM(I, T, Batt, sigma_i, sigma_v, delta)
 
     for k=2:length(I)
         soc(k)= soc(k-1)+(1/(3600*Cbatt))*(I(k))*(T(k)-T(k-1));
-        if soc(k) < 0
+        if soc(k) < 4
             error('Battery is Empty!!')
         elseif soc(k) > 1
             error('Battery is Full!!')

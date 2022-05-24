@@ -18,13 +18,12 @@ def battSIM(I = None,T = None,Batt = None,sigma_i = None,sigma_v = None,delta = 
     soc = np.zeros((len(I),1))
     l = len(soc)
     soc[1] = 0.5
-    # changed to 
-    for k in np.arange(1,len(I)).reshape(-1):
-        soc[k] = soc[k - 1] + (1 / (3600 * Cbatt)) * (I[k]) * (T[k] - T[k - 1])
-        if soc[k] < 0:
+    for k in np.arange(2,len(I)+1).reshape(-1):
+        soc[k] = soc(k - 1) + (1 / (3600 * Cbatt)) * (I(k)) * (T(k) - T(k - 1))
+        if soc(k) < 0:
             raise Exception('Battery is Empty!!')
         else:
-            if soc[k] > 1:
+            if soc(k) > 1:
                 raise Exception('Battery is Full!!')
     
     ##
