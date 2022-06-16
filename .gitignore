@@ -3,3 +3,5 @@ awt/iot_test/
 aws/iot_test/aws-iot-device-sdk-python
 BattSim/__pycache__/
 ~$*
+res/zsoc_curves
+*.pyc
