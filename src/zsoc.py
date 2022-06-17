@@ -48,7 +48,8 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
 
     # determination of OCV (generate Vo
     l = NPOINTS
-    zsoc = __scaling_fwd(np.linspace(0, 1, l), 0, 1, 0.175)
+    zsoc = np.linspace(0, 1, l)
+    zsoc = __scaling_fwd(zsoc, 0, 1, 0.175)
     K_para[0].append('zsoc')
     K_para[0].append('Vo')
     # print('zsoc:', zsoc)
