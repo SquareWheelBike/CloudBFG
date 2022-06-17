@@ -8,11 +8,12 @@ import os
 from math import log
 
 
-def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False):
+def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100):
 
     INPUTFILE = inputfile
     OUTPUTFOLDER = outputfolder
     DECIMALS = decimals
+    NPOINTS = resolution
 
     if OUTPUTFOLDER is None and generate_csv:
         raise ValueError('Must specify an output folder if generating a CSV file')
@@ -46,7 +47,7 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
         return (1 - 2 * E) * (x - x_min) / (x_max - x_min) + E
 
     # determination of OCV (generate Vo
-    l = 100
+    l = NPOINTS
     zsoc = __scaling_fwd(np.linspace(0, 1, l), 0, 1, 0.175)
     K_para[0].append('zsoc')
     K_para[0].append('Vo')
@@ -87,4 +88,5 @@ if __name__ == '__main__':
     INPUTFILE = '../res/K_para.csv'
     OUTPUTFOLDER = '../res/zsoc_curves'
     DECIMALS = 4
-    generate_curves(INPUTFILE, OUTPUTFOLDER, DECIMALS, verbose=True)
+    NPOINTS = 200
+    generate_curves(INPUTFILE, OUTPUTFOLDER, DECIMALS, verbose=True, resolution=NPOINTS)
