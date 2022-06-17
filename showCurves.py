@@ -1,10 +1,9 @@
 # A demo file to graph the OCV curves, overlayed on each other, for all batteries in the K_para.csv file.
 
-import zsoc
+import src.zsoc as zsoc
 import matplotlib.pyplot as plt
 
-INPUTFILE = '../res/K_para.csv'
-OUTPUTFOLDER = '../res/zsoc_curves'
+INPUTFILE = 'res/K_para.csv'
 DECIMALS = 4
 batteries = zsoc.generate_curves(INPUTFILE, decimals=4, verbose=False, generate_csv=False, resolution=200)[1:]
 
