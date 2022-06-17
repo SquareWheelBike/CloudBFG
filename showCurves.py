@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 
 INPUTFILE = 'res/K_para.csv'
 DECIMALS = 4
+
+# NOTE: the output from generate_curves uses basic datatypes, but has been designed to be able to drop into a pandas dataframe as-is
 batteries = zsoc.generate_curves(INPUTFILE, decimals=4, verbose=False, generate_csv=False, resolution=200)[1:]
 
 for battery in batteries:
