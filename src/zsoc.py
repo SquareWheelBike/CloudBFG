@@ -80,8 +80,23 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
                 for v, zk in zip(Vo, zsoc):
                     writer.writerow([round(zk, DECIMALS), round(v, DECIMALS)])
             print(' Done.') if verbose else None
+
+    # convert from list of lists to list of dictionaries (cleaner to work with)
+    batteries = [
+        # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,K8, zsoc, Vo
+        {
+            'sample': entry[0],
+            'manufacturer' : entry[1],
+            'serial' : entry[2],
+            'cell' : entry[3],
+            'k' : [float(x) for x in entry[4:13]],
+            'zsoc' : entry[13],
+            'Vo' : entry[14]
+        }
+        for entry in K_para[1:] 
+    ]
     
-    return K_para
+    return batteries
 
 
 if __name__ == '__main__':

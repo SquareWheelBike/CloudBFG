@@ -8,7 +8,7 @@ DECIMALS = 4
 batteries = zsoc.generate_curves(INPUTFILE, decimals=4, verbose=False, generate_csv=False, resolution=200)[1:]
 
 for battery in batteries:
-    plt.plot(battery[-2], battery[-1], label=battery[0])
+    plt.plot(battery['zsoc'], battery['Vo'], label=battery['sample'])
 plt.title(label='OCV curves for all batteries')
 plt.xlabel(xlabel='zsoc')
 plt.ylabel(ylabel='Vo')
