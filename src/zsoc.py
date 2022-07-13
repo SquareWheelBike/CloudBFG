@@ -9,6 +9,26 @@ from math import log
 
 
 def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100):
+    """
+    Generates a list of dictionaries, each containing the zsoc and Vo curves for a single battery.
+
+    :param inputfile: The path to the K_para.csv file.
+    :param outputfolder: The path to the folder where the output files will be saved. One CSV file will be created for each battery.
+    :param decimals: The number of decimal places to round the zsoc values to.
+    :param generate_csv: Whether to generate a CSV file for each battery. If false, just return the list of dictionaries.
+    :param verbose: Whether to print out the values of each battery as they are generated
+    :param resolution: The number of samples/points to generate across the zsoc curve.
+    
+    Each dictionary contains the following keys:
+    'sample' : str sample name,
+    'manufacturer' : str manufacturer name,
+    'serial' : str serial number,
+    'cell' : str cell number (series position),
+    'k' : list of floats, OCV curve coefficients,
+    'zsoc' : list of floats, zsoc values,
+    'Vo' : list of floats, Vo (OCV voltage) values
+
+    """
 
     INPUTFILE = inputfile
     OUTPUTFOLDER = outputfolder
