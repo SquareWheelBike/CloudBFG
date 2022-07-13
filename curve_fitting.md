@@ -4,10 +4,10 @@ Acceptable accuracy is 90% or more
 
 ## First Generation Estimation
 
-1. start by generating the curves for each of the sample k parameters using zsoc.py
-2. Generate a full discharge curve (no noise) for a battery with matching k parameters to the sample curves
-3. for each of the sample curves, and the sample curve, determine the rate of change throughout the curve
-4. the best guess for which curve is the best fit is the one with the closest rate of change to the sample curve
+- [ ] start by generating the curves for each of the sample k parameters using zsoc.py
+- [ ] Generate a full discharge curve (no noise) for a battery with matching k parameters to the sample curves
+- [ ] for each of the sample curves, and the sample curve, determine the rate of change throughout the curve
+- [ ] the best guess for which curve is the best fit is the one with the closest rate of change to the sample curve
 
 - The first guess can be using Vo from the simulator, for a perfect-match test case
 - The second run can be using Vout, the saggy loaded discharge curve
