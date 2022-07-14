@@ -1,5 +1,7 @@
 """
 Use batteries in ../res/K_para.csv to generate a set of zsoc curves for each battery.
+
+Uses same zsoc algorithm as BattSim.BattSim BattSim class (I need a better file structure for this), but I didn't import it, since that class has bloat for noise generation that I didn't need.
 """
 
 import csv
