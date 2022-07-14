@@ -11,7 +11,7 @@
 import src.zsoc as zsoc
 import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
-from src.BattSim.CurrentSIM import CurrentSIM
+import src.BattSim.CurrentSIM as CurrentSIM
 import numpy as np
 
 # generate the curves for each of the sample k parameters using zsoc.py
@@ -22,7 +22,7 @@ batteries = zsoc.generate_curves(INPUTFILE, verbose=False, generate_csv=False, r
 target_battery = batteries[np.random.randint(0, len(batteries))]
 sim_battery = BattSim(
     Kbatt=target_battery['Kbatt'],
-    Cbatt = 1.9,
+    Cbatt = 2,
     R0 = 0.2,
     R1 = 0.1,
     C1 = 5,
@@ -30,3 +30,10 @@ sim_battery = BattSim(
     C2 = 500,
     soc=1.0
 ) # note that only the Kbatt and soc is used for the simulation, the rest of the parameters are dummy values
+
+# simulate full discharge curve for the battery
+# discharge at 1C for 1h
+sim_battery.simulate(
+    *CurrentSIM.deepdischarge(delta=3600*1000/200) # milliseconds in an hour / resolution
+    
+)
