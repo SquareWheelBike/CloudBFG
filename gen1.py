@@ -25,7 +25,7 @@ target_battery = batteries[np.random.randint(0, len(batteries))]
 sim_battery = BattSim(
     Kbatt=target_battery['k'],
     Cbatt = 2,
-    R0 = 0.2,
+    R0 = target_battery['R0'],
     R1 = 0.1,
     C1 = 5,
     R2 = 0.3,
@@ -62,20 +62,20 @@ def derivative(L, dt):
 # not even bothering with time vector at this stage
 def find_curve(V, batteries):
     """
-    find the curve that matches the voltage and time data
-    V: list, batteries: list of dicts of batteries
+    find the curve closest to the voltage and time data
+    V: numpy array of voltages, batteries: list of dicts of batteries
 
     returns the Kbatt of the battery that matches the data
     if no match is found, returns None
     """
-    for batt in batteries:
-        # compare curves
-        if np.allclose(V, batt['Vo']):
-            return batt['k']
-        # compare derivatives
-        # if np.allclose(derivative(V, 1), derivative(batt['Vo'], 1)):
-        #     return batt['Kbatt']
-    return None
+    dV = derivative(V, 3600/200)
+    diffs = np.array([
+        # np.sum(np.abs(V - batt['Vo'])) for batt in batteries
+        np.sum(np.abs(dV - derivative(batt['Vo'], 3600/200))) for batt in batteries
+    ])
+    # find k parameters of the battery that matches the voltage data
+    # if no match is found, return None
+    return batteries[np.argmin(diffs)]['k']
 
 print('expected Kbatt:\t', target_battery['k'])
 print('actual Kbatt:\t', find_curve(Vo, batteries))
