@@ -10,7 +10,7 @@ import os
 from math import log
 
 
-def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100):
+def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100) -> list[dict]:
     """
     Generates a list of dictionaries, each containing the zsoc and Vo curves for a single battery.
 
@@ -28,8 +28,8 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     'cell' : str cell number (series position),
     'k' : list of floats, OCV curve coefficients,
     'R0' : float, series internal resistance,
-    'zsoc' : list of floats, zsoc values,
-    'Vo' : list of floats, Vo (OCV voltage) values
+    'zsoc' : np.ndarray of floats, zsoc values,
+    'Vo' : np.ndarray of floats, Vo (OCV voltage) values
 
     """
 
