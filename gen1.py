@@ -33,7 +33,11 @@ sim_battery = BattSim(
 
 # simulate full discharge curve for the battery
 # discharge at 1C for 1h
-sim_battery.simulate(
-    *CurrentSIM.deepdischarge(delta=3600*1000/200) # milliseconds in an hour / resolution
-    
-)
+I = np.ones(3600) * BattSim.Cbatt
+T = np.arange(3600)
+Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
+
+# Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
+
+# for gen 1, all we will do is compare the curves and that's good enough. the second and third generation will use the first and second derivatives of curves, and curve fitting to remove noise
+
