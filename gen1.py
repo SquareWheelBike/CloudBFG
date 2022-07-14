@@ -21,15 +21,17 @@ batteries = zsoc.generate_curves(INPUTFILE, verbose=False, generate_csv=False, r
 # pick a random battery and create a battery object for it
 # Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
 target_battery = batteries[np.random.randint(0, len(batteries))]
+print(target_battery['k'])
 sim_battery = BattSim(
-    Kbatt=target_battery['Kbatt'],
+    Kbatt=target_battery['k'],
     Cbatt = 2,
     R0 = 0.2,
     R1 = 0.1,
     C1 = 5,
     R2 = 0.3,
     C2 = 500,
-    soc=1.0
+    soc=1.0,
+    ModelID=1,
 ) # note that only the Kbatt and soc is used for the simulation, the rest of the parameters are dummy values
 
 # simulate full discharge curve for the battery
@@ -69,11 +71,11 @@ def find_curve(V, batteries):
     for batt in batteries:
         # compare curves
         if np.allclose(V, batt['Vo']):
-            return batt['Kbatt']
+            return batt['k']
         # compare derivatives
         # if np.allclose(derivative(V, 1), derivative(batt['Vo'], 1)):
         #     return batt['Kbatt']
     return None
 
-print('expected Kbatt:\t', target_battery['Kbatt'])
+print('expected Kbatt:\t', target_battery['k'])
 print('actual Kbatt:\t', find_curve(Vo, batteries))
