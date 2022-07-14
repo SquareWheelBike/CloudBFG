@@ -106,15 +106,15 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
 
     # convert from list of lists to list of dictionaries (cleaner to work with)
     batteries = [
-        # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7, zsoc, Vo
+        # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,K8, zsoc, Vo
         {
             'sample': entry[0],
             'manufacturer' : entry[1],
             'serial' : entry[2],
             'cell' : entry[3],
-            'k' : [float(x) for x in entry[4:12]],
-            'zsoc' : entry[12],
-            'Vo' : entry[13]
+            'k' : [float(x) for x in entry[4:13]],
+            'zsoc' : entry[13],
+            'Vo' : entry[14]
         }
         for entry in K_para[1:] 
     ]
