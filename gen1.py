@@ -21,7 +21,7 @@ batteries = zsoc.generate_curves(INPUTFILE, verbose=False, generate_csv=False, r
 # pick a random battery and create a battery object for it
 # Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
 target_battery = batteries[np.random.randint(0, len(batteries))]
-print(target_battery['k'])
+# print(target_battery['k'])
 sim_battery = BattSim(
     Kbatt=target_battery['k'],
     Cbatt = 2,
@@ -36,8 +36,8 @@ sim_battery = BattSim(
 
 # simulate full discharge curve for the battery
 # discharge at 1C for 1h
-I = np.ones(3600) * BattSim.Cbatt
-T = np.arange(3600)
+I = np.ones(200) * sim_battery.Cbatt * -1
+T = np.arange(0, 3600, 3600/200)
 Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
 
 # Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
