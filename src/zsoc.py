@@ -27,6 +27,7 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     'serial' : str serial number,
     'cell' : str cell number (series position),
     'k' : list of floats, OCV curve coefficients,
+    'R0' : float, series internal resistance,
     'zsoc' : list of floats, zsoc values,
     'Vo' : list of floats, Vo (OCV voltage) values
 
@@ -77,7 +78,7 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     # print('zsoc:', zsoc)
     for entry in K_para[1:]:
         print('Generating zsoc curve for battery', entry[0], entry[1:]) if verbose else None
-        Kbatt = list(map(float, entry[4:]))
+        Kbatt = list(map(float, entry[4:12]))
         Vo = np.zeros(l)  # create Vo (OCV voltage vector)
 
         for k, zk in enumerate(zsoc):
@@ -107,13 +108,14 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     # convert from list of lists to list of dictionaries (cleaner to work with)
     # NOTE: entry 12 is the NINTH k-parameter, but I am truncating it for now
     batteries = [
-        # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,K8, zsoc, Vo
+        # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,R0, zsoc, Vo
         {
             'sample': entry[0],
             'manufacturer' : entry[1],
             'serial' : entry[2],
             'cell' : entry[3],
             'k' : [float(x) for x in entry[4:12]],
+            'R0' : float(entry[12]),
             'zsoc' : entry[13],
             'Vo' : entry[14]
         }
