@@ -105,6 +105,7 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
             print(' Done.') if verbose else None
 
     # convert from list of lists to list of dictionaries (cleaner to work with)
+    # NOTE: entry 12 is the NINTH k-parameter, but I am truncating it for now
     batteries = [
         # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,K8, zsoc, Vo
         {
@@ -112,7 +113,7 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
             'manufacturer' : entry[1],
             'serial' : entry[2],
             'cell' : entry[3],
-            'k' : [float(x) for x in entry[4:13]],
+            'k' : [float(x) for x in entry[4:12]],
             'zsoc' : entry[13],
             'Vo' : entry[14]
         }
