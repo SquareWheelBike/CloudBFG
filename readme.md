@@ -38,6 +38,10 @@ Since this is ideal-case, as soon as estimation was working, it was 100% accurat
 - Taking the first and second derivatives of each OCV curve and comparing to the first and second derivatives of the sample is going to be the first attempt
 - Going to account for voltage sag, but not noise
 
+#### Results
+
+- The results are not perfect, but it is correct about half the time and is close to the correct answer when it isn't correct
+
 ### Third Generation Estimation (untouched)
 
 - Third generation will be where we start changing current throughout the discharge, since it will be rare that we will have a full, constant discharge curve.
