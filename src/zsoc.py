@@ -1,5 +1,7 @@
 """
 Use batteries in ../res/K_para.csv to generate a set of zsoc curves for each battery.
+
+Uses same zsoc algorithm as BattSim.BattSim BattSim class (I need a better file structure for this), but I didn't import it, since that class has bloat for noise generation that I didn't need.
 """
 
 import csv
@@ -8,7 +10,28 @@ import os
 from math import log
 
 
-def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100):
+def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100) -> list[dict]:
+    """
+    Generates a list of dictionaries, each containing the zsoc and Vo curves for a single battery.
+
+    :param inputfile: The path to the K_para.csv file.
+    :param outputfolder: The path to the folder where the output files will be saved. One CSV file will be created for each battery.
+    :param decimals: The number of decimal places to round the zsoc values to.
+    :param generate_csv: Whether to generate a CSV file for each battery. If false, just return the list of dictionaries.
+    :param verbose: Whether to print out the values of each battery as they are generated
+    :param resolution: The number of samples/points to generate across the zsoc curve.
+    
+    Each dictionary contains the following keys:
+    'sample' : str sample name,
+    'manufacturer' : str manufacturer name,
+    'serial' : str serial number,
+    'cell' : str cell number (series position),
+    'k' : list of floats, OCV curve coefficients,
+    'R0' : float, series internal resistance,
+    'zsoc' : np.ndarray of floats, zsoc values,
+    'Vo' : np.ndarray of floats, Vo (OCV voltage) values
+
+    """
 
     INPUTFILE = inputfile
     OUTPUTFOLDER = outputfolder
@@ -48,13 +71,14 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
 
     # determination of OCV (generate Vo
     l = NPOINTS
-    zsoc = __scaling_fwd(np.linspace(0, 1, l), 0, 1, 0.175)
+    zsoc = np.linspace(0, 1, l)
+    zsoc = __scaling_fwd(zsoc, 0, 1, 0.175)
     K_para[0].append('zsoc')
     K_para[0].append('Vo')
     # print('zsoc:', zsoc)
     for entry in K_para[1:]:
         print('Generating zsoc curve for battery', entry[0], entry[1:]) if verbose else None
-        Kbatt = list(map(float, entry[4:]))
+        Kbatt = list(map(float, entry[4:12]))
         Vo = np.zeros(l)  # create Vo (OCV voltage vector)
 
         for k, zk in enumerate(zsoc):
@@ -80,8 +104,25 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
                 for v, zk in zip(Vo, zsoc):
                     writer.writerow([round(zk, DECIMALS), round(v, DECIMALS)])
             print(' Done.') if verbose else None
+
+    # convert from list of lists to list of dictionaries (cleaner to work with)
+    # NOTE: entry 12 is the NINTH k-parameter, but I am truncating it for now
+    batteries = [
+        # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,R0, zsoc, Vo
+        {
+            'sample': entry[0],
+            'manufacturer' : entry[1],
+            'serial' : entry[2],
+            'cell' : entry[3],
+            'k' : [float(x) for x in entry[4:12]],
+            'R0' : float(entry[12]),
+            'zsoc' : entry[13],
+            'Vo' : entry[14]
+        }
+        for entry in K_para[1:] 
+    ]
     
-    return K_para
+    return batteries
 
 
 if __name__ == '__main__':
