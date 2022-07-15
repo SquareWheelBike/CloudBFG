@@ -62,7 +62,10 @@ def derivative(L: np.ndarray, dt: float = 1) -> np.ndarray:
         L = np.array(L)
     return (L[1:] - L[:-1]) / dt
 
-# not even bothering with time vector at this stage
+# calculate first and second derivatives of all curves for use later
+for battery in batteries:
+    battery['dV'] = derivative(battery['Vo'], delta)
+    battery['dV2'] = derivative(battery['dV'], delta)
 
 
 def find_curve(V: np.ndarray, batteries: list[dict]):
@@ -78,14 +81,15 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     batteries = batteries[:]
     np.random.shuffle(batteries)
 
-    delta = 3600 / 200
+    delta = 3600 / 200 # using 200 points on everything
 
-    # find the rate of change of the Vo curve
     # reverse V so slope is positive
     V = V[::-1]
+
     # find the rate of change of the Vo curve
-    # dV = derivative(V, delta)
-    # dV2 = derivative(dV, delta)
+    # find the rate of change of the Vo curve
+    dV = derivative(V, delta)
+    dV2 = derivative(dV, delta)    
 
     # this will NOT WORK if the datapoints being used are not numpy arrays
     assert(type(V) is np.ndarray)
