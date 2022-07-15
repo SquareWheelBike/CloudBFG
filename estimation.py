@@ -62,15 +62,10 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     returns the Kbatt of the battery that matches the data
     """
 
-    # shuffle batteries
-    batteries = batteries[:]
-    np.random.shuffle(batteries)
-
-
-    # reverse V so slope is positive
+    # reverse V so slope is positive,
+    # assuming input V vector is a discharce curve
     V = V[::-1]
 
-    # find the rate of change of the Vo curve
     # find the rate of change of the Vo curve
     delta = 3600 / 200  # using 200 points on everything
     dV = derivative(V, delta)
@@ -82,8 +77,8 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
 
     # find the closest match to the sample curve
 
-    # error contains the (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
-    error = np.array([
+    # diff contains tuple (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
+    diff = np.array([
         (
             np.sum(np.abs(V - battery['Vo'])),
             np.sum(np.abs(dV - battery['dV'])),
@@ -91,9 +86,15 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
         ) for battery in batteries
     ])
 
-    # return the battery that matches the closest match
-    return batteries[np.argmin(error[1])]
+    # TODO: rework estimation to use a weighted combination of the difference metrics
+    match = batteries[np.argmin(diff[1])]
 
+    return match
+
+
+# shuffle batteries so that test can start with a random battery
+batteries = batteries[:]
+np.random.shuffle(batteries)
 
 print('expected Kbatt:\t', target_battery['k'])
 
