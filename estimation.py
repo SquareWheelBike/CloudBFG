@@ -39,28 +39,11 @@ sim_battery = BattSim(
 # discharge at 1C for 1h
 I = np.ones(200) * sim_battery.Cbatt * -1
 T = np.arange(0, 3600, 3600/200)
-Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
+Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
 
 # Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
 
-# for gen 1, all we will do is compare the curves and that's good enough. the second and third generation will use the first and second derivatives of curves, and curve fitting to remove noise
-# essentially, the point of gen 1 is to just show that in ideal case, we can actually use a cache and recorded datapoints to lookup K values
-
-# find the rate of change of a vector passed
-
-
-def derivative(L: np.ndarray, dt: float = 1) -> np.ndarray:
-    """
-    find the rate of change of a vector
-    L: numpy array, volts, dt: float, seconds between datapoints
-
-    returns the rate of change of the vector
-    """
-    if len(L) < 2:
-        return 0
-    if type(L) is not np.ndarray:
-        L = np.array(L)
-    return (L[1:] - L[:-1]) / dt
+from src.tools import derivative
 
 # calculate first and second derivatives of all curves for use later
 for battery in batteries:
