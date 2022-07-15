@@ -46,6 +46,7 @@ Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
 
 
 # calculate first and second derivatives of all curves for use later
+delta = 3600 / 200  # using 200 points on everything
 for battery in batteries:
     battery['dV'] = derivative(battery['Vo'], delta)
     battery['dV2'] = derivative(battery['dV'], delta)
@@ -65,13 +66,13 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     batteries = batteries[:]
     np.random.shuffle(batteries)
 
-    delta = 3600 / 200  # using 200 points on everything
 
     # reverse V so slope is positive
     V = V[::-1]
 
     # find the rate of change of the Vo curve
     # find the rate of change of the Vo curve
+    delta = 3600 / 200  # using 200 points on everything
     dV = derivative(V, delta)
     dV2 = derivative(dV, delta)
 
@@ -91,7 +92,7 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     ])
 
     # return the battery that matches the closest match
-    return batteries[np.argmin(error)]
+    return batteries[np.argmin(error[1])]
 
 
 print('expected Kbatt:\t', target_battery['k'])
