@@ -10,7 +10,7 @@ import os
 from math import log
 
 
-def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100) -> list[dict]:
+def generate_curves(inputfile: str, outputfolder: str = None, decimals: int = 4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100) -> list[dict]:
     """
     Generates a list of dictionaries, each containing the zsoc and Vo curves for a single battery.
 
@@ -20,7 +20,7 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     :param generate_csv: Whether to generate a CSV file for each battery. If false, just return the list of dictionaries.
     :param verbose: Whether to print out the values of each battery as they are generated
     :param resolution: The number of samples/points to generate across the zsoc curve.
-    
+
     Each dictionary contains the following keys:
     'sample' : str sample name,
     'manufacturer' : str manufacturer name,
@@ -39,7 +39,8 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     NPOINTS = resolution
 
     if OUTPUTFOLDER is None and generate_csv:
-        raise ValueError('Must specify an output folder if generating a CSV file')
+        raise ValueError(
+            'Must specify an output folder if generating a CSV file')
 
     # import ../res/K_para.csv into a list of dictionary values
     print('Importing all data for batteries:') if verbose else None
@@ -60,7 +61,8 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
             print(f'Creating {OUTPUTFOLDER}/') if verbose else None
             os.makedirs(OUTPUTFOLDER)
         else:
-            print(f'Directory {OUTPUTFOLDER}/ already exists. Clearing contents.') if verbose else None
+            print(
+                f'Directory {OUTPUTFOLDER}/ already exists. Clearing contents.') if verbose else None
             for file in os.listdir(OUTPUTFOLDER):
                 os.remove(f'{OUTPUTFOLDER}/{file}')
 
@@ -77,7 +79,8 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
     K_para[0].append('Vo')
     # print('zsoc:', zsoc)
     for entry in K_para[1:]:
-        print('Generating zsoc curve for battery', entry[0], entry[1:]) if verbose else None
+        print('Generating zsoc curve for battery',
+              entry[0], entry[1:]) if verbose else None
         Kbatt = list(map(float, entry[4:12]))
         Vo = np.zeros(l)  # create Vo (OCV voltage vector)
 
@@ -111,17 +114,17 @@ def generate_curves(inputfile: str, outputfolder: str=None, decimals: int=4, gen
         # Sample No.,Battery Manufacturer,Serial Number,Cell Number,K0,K1,K2,K3,K4,K5,K6,K7,R0, zsoc, Vo
         {
             'sample': entry[0],
-            'manufacturer' : entry[1],
-            'serial' : entry[2],
-            'cell' : entry[3],
-            'k' : [float(x) for x in entry[4:12]],
-            'R0' : float(entry[12]),
-            'zsoc' : entry[13],
-            'Vo' : entry[14]
+            'manufacturer': entry[1],
+            'serial': entry[2],
+            'cell': entry[3],
+            'k': [float(x) for x in entry[4:12]],
+            'R0': float(entry[12]),
+            'zsoc': entry[13],
+            'Vo': entry[14]
         }
-        for entry in K_para[1:] 
+        for entry in K_para[1:]
     ]
-    
+
     return batteries
 
 
@@ -130,4 +133,5 @@ if __name__ == '__main__':
     OUTPUTFOLDER = '../res/zsoc_curves'
     DECIMALS = 4
     NPOINTS = 200
-    generate_curves(INPUTFILE, OUTPUTFOLDER, DECIMALS, verbose=True, resolution=NPOINTS)
+    generate_curves(INPUTFILE, OUTPUTFOLDER, DECIMALS,
+                    verbose=True, resolution=NPOINTS)
