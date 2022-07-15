@@ -36,7 +36,7 @@ Since this is ideal-case, as soon as estimation was working, it was 100% accurat
 #### First Attempt
 
 - Taking the first and second derivatives of each OCV curve and comparing to the first and second derivatives of the sample is going to be the first attempt
-- No actual curve fitting is being done yet for noise removal
+- Going to account for voltage sag, but not noise
 
 ### Third Generation Estimation
 
