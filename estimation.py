@@ -8,6 +8,7 @@
 # - The first guess can be using Vo from the simulator, for a perfect-match test case
 # - The second run can be using Vout, the saggy loaded discharge curve
 
+from src.tools import derivative
 import src.zsoc as zsoc
 import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
@@ -20,9 +21,11 @@ batteries = zsoc.generate_curves(
     INPUTFILE, verbose=False, generate_csv=False, resolution=200)
 
 # pick a random battery and create a battery object for it
-# Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
 target_battery = batteries[np.random.randint(0, len(batteries))]
-# print(target_battery['k'])
+
+
+# run the chosen sample battery through the BattSim simulator to introduce noise
+# Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
 sim_battery = BattSim(
     Kbatt=target_battery['k'],
     Cbatt=2,
@@ -41,9 +44,6 @@ I = np.ones(200) * sim_battery.Cbatt * -1
 T = np.arange(0, 3600, 3600/200)
 Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
 
-# Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
-
-from src.tools import derivative
 
 # calculate first and second derivatives of all curves for use later
 for battery in batteries:
@@ -51,6 +51,7 @@ for battery in batteries:
     battery['dV2'] = derivative(battery['dV'], delta)
 
 
+# Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
 def find_curve(V: np.ndarray, batteries: list[dict]):
     """
     find the curve that fits closest to the Vo of one of the batteries
@@ -64,7 +65,7 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     batteries = batteries[:]
     np.random.shuffle(batteries)
 
-    delta = 3600 / 200 # using 200 points on everything
+    delta = 3600 / 200  # using 200 points on everything
 
     # reverse V so slope is positive
     V = V[::-1]
@@ -72,21 +73,28 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     # find the rate of change of the Vo curve
     # find the rate of change of the Vo curve
     dV = derivative(V, delta)
-    dV2 = derivative(dV, delta)    
+    dV2 = derivative(dV, delta)
 
     # this will NOT WORK if the datapoints being used are not numpy arrays
     assert(type(V) is np.ndarray)
     assert(all(type(battery['Vo']) is np.ndarray for battery in batteries))
 
     # find the closest match to the sample curve
-    error = np.array(
-        [np.sum(np.abs(V - battery['Vo']))
-         for battery in batteries]
-    )
+
+    # error contains the (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
+    error = np.array([
+        (
+            np.sum(np.abs(V - battery['Vo'])),
+            np.sum(np.abs(dV - battery['dV'])),
+            np.sum(np.abs(dV2 - battery['dV2'])),
+        ) for battery in batteries
+    ])
 
     # return the battery that matches the closest match
     return batteries[np.argmin(error)]
 
 
 print('expected Kbatt:\t', target_battery['k'])
-print('actual Kbatt:\t', find_curve(Vo, batteries)['k'])
+
+# Vo + Vbatt = Vout with voltage sag for a non noisy uniform load
+print('actual Kbatt:\t', find_curve(Vo + Vbatt, batteries)['k'])
