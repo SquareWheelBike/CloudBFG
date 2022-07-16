@@ -55,16 +55,19 @@ ax[2].grid(True)
 plt.show()
 ```
 
-![Derivatives](img/derivatives.png)
+![Derivatives](img/fig2_1.png)
 
 #### First Attempt
 
 - Taking the first and second derivatives of each OCV curve and comparing to the first and second derivatives of the sample is going to be the first attempt
 - Going to account for voltage sag, but not noise
 
-#### Results
+Results:
 
 - The results are not perfect, but it is correct about half the time and is close to the correct answer when it isn't correct
+- Looking at the results, it is clear that derivatives will be the best way to see if curves can be overlayed
+
+![results_gen2_first_attempt](img/fig2_2.png)
 
 ### Third Generation Estimation (untouched)
 

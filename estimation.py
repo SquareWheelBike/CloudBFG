@@ -31,10 +31,6 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     assert(type(V) is np.ndarray)
     assert(all(type(battery['Vo']) is np.ndarray for battery in batteries))
 
-    # reverse V so slope is positive,
-    # assuming input V vector is a discharce curve
-    V = V[::-1]
-
     # find the rate of change of the Vo curve
     delta = 3600 / 200  # using 200 points on everything
     dV = derivative(V, delta)
@@ -51,7 +47,7 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     # diff contains tuple (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
     diff = np.array([
         (
-            np.sum(np.abs(V - battery['Vo'])),
+            # np.sum(np.abs(V - battery['Vo'])),
             np.sum(np.abs(dV - battery['dV'])),
             np.sum(np.abs(dV2 - battery['dV2'])),
         ) for battery in batteries
@@ -122,21 +118,25 @@ if __name__ == '__main__':
     print('expected Kbatt:\t', target_battery['k'])
 
     # Vo + Vbatt = Vout with voltage sag for a non noisy uniform load
-    print('actual Kbatt:\t', find_curve(Vo + Vbatt, batteries)['k'])
+    V = Vo + Vbatt
+    # reverse V so slope is positive,
+    # assuming input V vector is a discharge curve
+    V = V[::-1]
+    print('actual Kbatt:\t', find_curve(V, batteries)['k'])
 
-    dV = derivative(Vo + Vbatt, delta)
+    dV = derivative(V, delta)
     dV2 = derivative(dV, delta)
 
-    # # plot the expected and actual curves
-    # fig, ax = plt.subplots(2, 1, sharex=True)
-    # ax[0].plot(Vo + Vbatt, label='Vo + Vbatt')
-    # ax[0].plot(target_battery['Vo'], label='expected Vo')
-    # ax[1].plot(dV, label='dVo')
-    # ax[1].plot(target_battery['dV'], label='expected dVo')
-    # ax[2].plot(dV2, label='d2Vo')
-    # ax[2].plot(target_battery['dV2'], label='expected d2Vo')
-    # fig.suptitle('compare expected and actual curves')
-    # for _ax in ax:
-    #     _ax.grid(True)
-    #     _ax.legend()
-    # plt.show()
+    # plot the expected and actual curves
+    fig, ax = plt.subplots(3, 1, sharex=True)
+    ax[0].plot(V, label='Vo + Vbatt')
+    ax[0].plot(target_battery['Vo'], label='expected Vo')
+    ax[1].plot(dV, label='dVo')
+    ax[1].plot(target_battery['dV'], label='expected dVo')
+    ax[2].plot(dV2, label='d2Vo')
+    ax[2].plot(target_battery['dV2'], label='expected d2Vo')
+    fig.suptitle('compare expected and actual curves')
+    for _ax in ax:
+        _ax.grid(True)
+        _ax.legend()
+    plt.show()
