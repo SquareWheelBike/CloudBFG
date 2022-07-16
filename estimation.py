@@ -123,3 +123,20 @@ if __name__ == '__main__':
 
     # Vo + Vbatt = Vout with voltage sag for a non noisy uniform load
     print('actual Kbatt:\t', find_curve(Vo + Vbatt, batteries)['k'])
+
+    dV = derivative(Vo + Vbatt, delta)
+    dV2 = derivative(dV, delta)
+
+    # # plot the expected and actual curves
+    # fig, ax = plt.subplots(2, 1, sharex=True)
+    # ax[0].plot(Vo + Vbatt, label='Vo + Vbatt')
+    # ax[0].plot(target_battery['Vo'], label='expected Vo')
+    # ax[1].plot(dV, label='dVo')
+    # ax[1].plot(target_battery['dV'], label='expected dVo')
+    # ax[2].plot(dV2, label='d2Vo')
+    # ax[2].plot(target_battery['dV2'], label='expected d2Vo')
+    # fig.suptitle('compare expected and actual curves')
+    # for _ax in ax:
+    #     _ax.grid(True)
+    #     _ax.legend()
+    # plt.show()
