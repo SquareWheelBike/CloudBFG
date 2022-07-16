@@ -35,7 +35,7 @@ Since this is ideal-case, as soon as estimation was working, it was 100% accurat
 
 #### The Process
 
-I calculate the first and second derivatives, to try to fit based on rate of change of the cell. Below are the curves for all samples, with the first derivative and second derivative curves.
+I calculate the first and second derivatives, to try to fit based on rate of change of the cell potential. Below are the curves for all samples, with the first derivative and second derivative curves.
 
 ```py
 # plot curves and derivatives for the sample battery
@@ -62,12 +62,25 @@ plt.show()
 - Taking the first and second derivatives of each OCV curve and comparing to the first and second derivatives of the sample is going to be the first attempt
 - Going to account for voltage sag, but not noise
 
-Results:
+##### Results:
 
 - The results are not perfect, but it is correct about half the time and is close to the correct answer when it isn't correct
 - Looking at the results, it is clear that derivatives will be the best way to see if curves can be overlayed
 
 ![results_gen2_first_attempt](img/fig2_2.png)
+
+```txt
+expected Kbatt:  [-1.3313, 28.2101, -4.8784, 0.5292, -0.0247, -18.9233, 37.9843, -0.27]
+actual Kbatt:    [-0.9741, 30.3903, -5.2017, 0.5596, -0.0259, -21.3917, 41.5533, -0.3517]
+```
+
+<sub>*This result is using a Model=1 BattSim with voltage sag, but no noise</sub>
+
+#### Second Attempt
+
+- I am going to try a metric where I subtract the sample and target curves, and calculate how consistent the distance between the curves are. 
+  - This does essentially the same thing as the first attempt's dV derivative metric, but should help account for noise, where dV does not account for noise
+  - It is being tested because, though it may not be scaleable, it may be computationally faster than noise removal/curve fitting and is worth trying
 
 ### Third Generation Estimation (untouched)
 
