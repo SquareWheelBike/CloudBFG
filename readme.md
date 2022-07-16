@@ -33,6 +33,30 @@ Since this is ideal-case, as soon as estimation was working, it was 100% accurat
 - Second generation fitting will be done with noisy Vout curves
 - This means that curve fitting will happen on the samples first, and then the clean curves will be compared to the sample set
 
+#### The Process
+
+I calculate the first and second derivatives, to try to fit based on rate of change of the cell. Below are the curves for all samples, with the first derivative and second derivative curves.
+
+```py
+# plot curves and derivatives for the sample battery
+fig, ax = plt.subplots(3, 1, sharex=True)
+for battery in batteries:
+    ax[0].plot(battery['Vo'])
+    ax[1].plot(battery['dV'])
+    ax[2].plot(battery['dV2'])
+
+ax[0].title.set_text('Vo')
+ax[1].title.set_text('dVo')
+ax[2].title.set_text('d2Vo')
+fig.suptitle('Derivatives of Curves')
+ax[0].grid(True)
+ax[1].grid(True)
+ax[2].grid(True)
+plt.show()
+```
+
+![Derivatives](img/derivatives.png)
+
 #### First Attempt
 
 - Taking the first and second derivatives of each OCV curve and comparing to the first and second derivatives of the sample is going to be the first attempt

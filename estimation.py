@@ -47,9 +47,28 @@ Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
 
 # calculate first and second derivatives of all curves for use later
 delta = 3600 / 200  # using 200 points on everything
+
 for battery in batteries:
     battery['dV'] = derivative(battery['Vo'], delta)
     battery['dV2'] = derivative(battery['dV'], delta)
+
+
+# plot curves and derivatives for the sample battery
+fig, ax = plt.subplots(3, 1, sharex=True)
+for battery in batteries:
+    ax[0].plot(battery['Vo'])
+    ax[1].plot(battery['dV'])
+    ax[2].plot(battery['dV2'])
+
+ax[0].title.set_text('Vo')
+ax[1].title.set_text('dVo')
+ax[2].title.set_text('d2Vo')
+fig.suptitle('Derivatives of Curves')
+ax[0].grid(True)
+ax[1].grid(True)
+ax[2].grid(True)
+plt.show()
+
 
 
 # Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
@@ -70,6 +89,12 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     delta = 3600 / 200  # using 200 points on everything
     dV = derivative(V, delta)
     dV2 = derivative(dV, delta)
+
+    # plt.plot(V, label='Vo')
+    # plt.plot(dV, label='dVo')
+    # plt.plot(dV2, label='d2Vo')
+    # plt.legend()
+    # plt.show()
 
     # this will NOT WORK if the datapoints being used are not numpy arrays
     assert(type(V) is np.ndarray)
