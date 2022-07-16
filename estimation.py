@@ -8,7 +8,7 @@
 # - The first guess can be using Vo from the simulator, for a perfect-match test case
 # - The second run can be using Vout, the saggy loaded discharge curve
 
-from src.tools import derivative
+from src.tools import derivative, integrate_subtract
 import src.zsoc as zsoc
 import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
@@ -48,8 +48,8 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     diff = np.array([
         (
             # np.sum(np.abs(V - battery['Vo'])),
-            np.sum(np.abs(dV - battery['dV'])),
-            np.sum(np.abs(dV2 - battery['dV2'])),
+            integrate_subtract(dV, battery['dV']),
+            integrate_subtract(dV2, battery['dV2']),
         ) for battery in batteries
     ])
 
@@ -84,36 +84,20 @@ if __name__ == '__main__':
 
     # simulate full discharge curve for the battery
     # discharge at 1C for 1h
+    delta = 3600 / 200  # using 200 points on everything
     I = np.ones(200) * sim_battery.Cbatt * -1
-    T = np.arange(0, 3600, 3600/200)
+    T = np.arange(0, 3600, delta)
     Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
 
     # calculate first and second derivatives of all curves for use later
-    delta = 3600 / 200  # using 200 points on everything
 
     for battery in batteries:
         battery['dV'] = derivative(battery['Vo'], delta)
         battery['dV2'] = derivative(battery['dV'], delta)
 
-    # # plot curves and derivatives for the sample battery
-    # fig, ax = plt.subplots(3, 1, sharex=True)
-    # for battery in batteries:
-    #     ax[0].plot(battery['Vo'])
-    #     ax[1].plot(battery['dV'])
-    #     ax[2].plot(battery['dV2'])
-
-    # ax[0].title.set_text('Vo')
-    # ax[1].title.set_text('dVo')
-    # ax[2].title.set_text('d2Vo')
-    # fig.suptitle('Derivatives of Curves')
-    # ax[0].grid(True)
-    # ax[1].grid(True)
-    # ax[2].grid(True)
-    # plt.show()
-
     # shuffle batteries so that test can start with a random battery
-    batteries = batteries[:]
-    np.random.shuffle(batteries)
+    # batteries = batteries[:]
+    # np.random.shuffle(batteries)
 
     print('expected Kbatt:\t', target_battery['k'])
 

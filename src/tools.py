@@ -12,3 +12,13 @@ def derivative(L: np.ndarray, dt: float = 1) -> np.ndarray:
     if type(L) is not np.ndarray:
         L = np.array(L)
     return (L[1:] - L[:-1]) / dt
+
+def integrate_subtract(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """
+    integrate the difference of two vectors
+    a: numpy array, volts
+    b: numpy array, volts
+
+    returns the integrated result
+    """
+    return np.sum(np.abs(a - b))
