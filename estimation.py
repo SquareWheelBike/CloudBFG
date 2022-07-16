@@ -53,22 +53,21 @@ for battery in batteries:
     battery['dV2'] = derivative(battery['dV'], delta)
 
 
-# plot curves and derivatives for the sample battery
-fig, ax = plt.subplots(3, 1, sharex=True)
-for battery in batteries:
-    ax[0].plot(battery['Vo'])
-    ax[1].plot(battery['dV'])
-    ax[2].plot(battery['dV2'])
+# # plot curves and derivatives for the sample battery
+# fig, ax = plt.subplots(3, 1, sharex=True)
+# for battery in batteries:
+#     ax[0].plot(battery['Vo'])
+#     ax[1].plot(battery['dV'])
+#     ax[2].plot(battery['dV2'])
 
-ax[0].title.set_text('Vo')
-ax[1].title.set_text('dVo')
-ax[2].title.set_text('d2Vo')
-fig.suptitle('Derivatives of Curves')
-ax[0].grid(True)
-ax[1].grid(True)
-ax[2].grid(True)
-plt.show()
-
+# ax[0].title.set_text('Vo')
+# ax[1].title.set_text('dVo')
+# ax[2].title.set_text('d2Vo')
+# fig.suptitle('Derivatives of Curves')
+# ax[0].grid(True)
+# ax[1].grid(True)
+# ax[2].grid(True)
+# plt.show()
 
 
 # Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
@@ -112,7 +111,7 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     ])
 
     # TODO: rework estimation to use a weighted combination of the difference metrics
-    match = batteries[np.argmin(diff[1])]
+    match = batteries[np.argmin(np.sum(diff, axis=1))]
 
     return match
 
