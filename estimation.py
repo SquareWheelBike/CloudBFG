@@ -36,12 +36,6 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     dV = derivative(V, delta)
     dV2 = derivative(dV, delta)
 
-    # plt.plot(V, label='Vo')
-    # plt.plot(dV, label='dVo')
-    # plt.plot(dV2, label='d2Vo')
-    # plt.legend()
-    # plt.show()
-
     # find the closest match to the sample curve
 
     # diff contains tuple (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
@@ -70,14 +64,12 @@ if __name__ == '__main__':
 
     # run the chosen sample battery through the BattSim simulator to introduce noise
     # Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
+    from tools import dummy_RC
     sim_battery = BattSim(
         Kbatt=target_battery['k'],
         Cbatt=2,
         R0=target_battery['R0'],
-        R1=0.1,
-        C1=5,
-        R2=0.3,
-        C2=500,
+        *dummy_RC,
         soc=1.0,
         ModelID=1,
     )  # note that only the Kbatt and soc is used for the simulation, the rest of the parameters are dummy values
@@ -95,23 +87,18 @@ if __name__ == '__main__':
         battery['dV'] = derivative(battery['Vo'], delta)
         battery['dV2'] = derivative(battery['dV'], delta)
 
-    # shuffle batteries so that test can start with a random battery
-    # batteries = batteries[:]
-    # np.random.shuffle(batteries)
-
     print('expected Kbatt:\t', target_battery['k'])
 
-    # Vo + Vbatt = Vout with voltage sag for a non noisy uniform load
+    # Vo + Vbatt = V with sag and noise
     V = Vo + Vbatt
-    # reverse V so slope is positive,
-    # assuming input V vector is a discharge curve
+    # reverse V so slope is positive, assuming input V vector is a discharge curve
     V = V[::-1]
-    print('actual Kbatt:\t', find_curve(V, batteries)['k'])
-
     dV = derivative(V, delta)
     dV2 = derivative(dV, delta)
 
-    # plot the expected and actual curves
+    print('actual Kbatt:\t', find_curve(V, batteries)['k'])
+
+    # plot the expected and actual curves for comparison
     fig, ax = plt.subplots(3, 1, sharex=True)
     ax[0].plot(V, label='Vo + Vbatt')
     ax[0].plot(target_battery['Vo'], label='expected Vo')
