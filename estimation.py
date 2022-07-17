@@ -83,7 +83,7 @@ if __name__ == '__main__':
     delta = 3600 / 200  # using 200 points on everything
     I = np.ones(200) * sim_battery.Cbatt * -1
     T = np.arange(0, 3600, delta)
-    Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
+    Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
 
     # calculate first and second derivatives of all curves for use later
 
@@ -104,8 +104,8 @@ if __name__ == '__main__':
     print('actual Kbatt:\t', guess_k['k'])
 
     # plot the expected and actual curves for comparison
-    # plt.plot(V, label='guess Vo + Vbatt')
-    plt.plot(target_battery['Vo'], label='target OCV curve')
+    plt.plot(V, label='noisy loaded sample curve')
+    plt.plot(target_battery['Vo'], label='correct OCV curve')
     plt.plot(Vo[::-1], label='guess OCV curve')
     plt.title('compare expected and actual curves')
     plt.legend()
