@@ -84,7 +84,7 @@ actual Kbatt:    [-0.9741, 30.3903, -5.2017, 0.5596, -0.0259, -21.3917, 41.5533,
 
 ##### Results:
 
-- Results are perfect every time, even with voltage noise introduced
+- correctness: 87.8%
 - Changed the search metric used to subtract the sample from each target curve and integrate them, to get the area where the curves do not overlap. A shorter sum is better; pick the closest one
 
 ![results_gen2_second_attempt](img/fig2_3.png)
@@ -96,9 +96,9 @@ actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.322
 
 #### Third Attempt
 
-- do testing to determine an actual accuracy %
-- start introducing more noise into the curves until the accuracy starts to drop
-- Introduce some current noise? still do a full 1C discharge, but with slight noise, so the curves can no longer be perfect matches
+- [x] do testing to determine an actual accuracy %
+- [ ] start introducing more noise into the curves until the accuracy starts to drop
+- [ ] Introduce some current noise? still do a full 1C discharge, but with slight noise, so the curves can no longer be perfect matches
 
 ### Third Generation Estimation (untouched)
 

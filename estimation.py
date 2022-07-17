@@ -61,52 +61,65 @@ if __name__ == '__main__':
     batteries = zsoc.generate_curves(
         INPUTFILE, verbose=False, generate_csv=False, resolution=200)
 
-    # pick a random battery and create a battery object for it
-    target_battery = batteries[np.random.randint(0, len(batteries))]
+    # test a bunch of times
+    TESTS = 1000
+    
+    correctness = [] # list of bools of whether a guess was correct
+    from progress.bar import Bar
+    bar = Bar('Testing', max=TESTS)
+    for i in range(TESTS):
+        # pick a random battery and create a battery object for it
+        target_battery = batteries[np.random.randint(0, len(batteries))]
 
-    # run the chosen sample battery through the BattSim simulator to introduce noise
-    # Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
-    sim_battery = BattSim(
-        Kbatt=target_battery['k'],
-        Cbatt=2,
-        R0=target_battery['R0'],
-        R1=0.1,
-        C1=5,
-        R2=0.3,
-        C2=500,
-        soc=1.0,
-        ModelID=1,
-    )  # note that only the Kbatt and soc is used for the simulation, the rest of the parameters are dummy values
+        # run the chosen sample battery through the BattSim simulator to introduce noise
+        # Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
+        sim_battery = BattSim(
+            Kbatt=target_battery['k'],
+            Cbatt=2,
+            R0=target_battery['R0'],
+            R1=0.1,
+            C1=5,
+            R2=0.3,
+            C2=500,
+            soc=1.0,
+            ModelID=1,
+        )  # note that only the Kbatt and soc is used for the simulation, the rest of the parameters are dummy values
 
-    # simulate full discharge curve for the battery
-    # discharge at 1C for 1h
-    delta = 3600 / 200  # using 200 points on everything
-    I = np.ones(200) * sim_battery.Cbatt * -1
-    T = np.arange(0, 3600, delta)
-    Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
+        # simulate full discharge curve for the battery
+        # discharge at 1C for 1h
+        delta = 3600 / 200  # using 200 points on everything
+        I = np.ones(200) * sim_battery.Cbatt * -1
+        T = np.arange(0, 3600, delta)
+        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
 
-    # calculate first and second derivatives of all curves for use later
+        # calculate first and second derivatives of all curves for use later
 
-    # for battery in batteries:
-    #     battery['dV'] = derivative(battery['Vo'], delta)
-    #     battery['dV2'] = derivative(battery['dV'], delta)
+        # for battery in batteries:
+        #     battery['dV'] = derivative(battery['Vo'], delta)
+        #     battery['dV2'] = derivative(battery['dV'], delta)
 
-    print('expected Kbatt:\t', target_battery['k'])
+        # print('expected Kbatt:\t', target_battery['k'])
 
-    # Vo + Vbatt = V with sag and noise
-    V = Vo + Vbatt
-    # reverse V so slope is positive, assuming input V vector is a discharge curve
-    V = V[::-1]
-    # dV = derivative(V, delta)
-    # dV2 = derivative(dV, delta)
+        # Vo + Vbatt = V with sag and noise
+        V = Vo + Vbatt
+        # reverse V so slope is positive, assuming input V vector is a discharge curve
+        V = V[::-1]
+        # dV = derivative(V, delta)
+        # dV2 = derivative(dV, delta)
 
-    guess_k = find_curve(V, batteries)
-    print('actual Kbatt:\t', guess_k['k'])
+        guess_batt = find_curve(V, batteries)
+        # print('actual Kbatt:\t', guess_batt['k'])
 
-    # plot the expected and actual curves for comparison
-    plt.plot(V, label='noisy loaded sample curve')
-    plt.plot(target_battery['Vo'], label='correct OCV curve')
-    plt.plot(Vo[::-1], label='guess OCV curve')
-    plt.title('compare expected and actual curves')
-    plt.legend()
-    plt.show()
+        # # plot the expected and actual curves for comparison
+        # plt.plot(V, label='noisy loaded sample curve')
+        # plt.plot(target_battery['Vo'], label='correct OCV curve')
+        # plt.plot(Vo[::-1], label='guess OCV curve')
+        # plt.title('compare expected and actual curves')
+        # plt.legend()
+        # plt.show()
+
+        correctness.append(all(a == b for a, b in zip(guess_batt['k'], target_battery['k'])))
+        bar.next()
+    bar.finish()
+
+    print(f'correctness: {sum(correctness)/len(correctness)*100}%')
