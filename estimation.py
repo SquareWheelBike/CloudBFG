@@ -62,8 +62,8 @@ if __name__ == '__main__':
         INPUTFILE, verbose=False, generate_csv=False, resolution=200)
 
     # test a bunch of times
-    TESTS = 1000
-    
+    TESTS = 400
+
     correctness = [] # list of bools of whether a guess was correct
     from progress.bar import Bar
     bar = Bar('Testing', max=TESTS)
