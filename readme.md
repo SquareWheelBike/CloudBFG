@@ -82,10 +82,29 @@ actual Kbatt:    [-0.9741, 30.3903, -5.2017, 0.5596, -0.0259, -21.3917, 41.5533,
   - This does essentially the same thing as the first attempt's dV derivative metric, but should help account for noise, where dV does not account for noise
   - It is being tested because, though it may not be scaleable, it may be computationally faster than noise removal/curve fitting and is worth trying
 
+##### Results:
+
+- Results are perfect every time, even with voltage noise introduced
+- Changed the search metric used to subtract the sample from each target curve and integrate them, to get the area where the curves do not overlap. A shorter sum is better; pick the closest one
+
+![results_gen2_second_attempt](img/fig2_3.png)
+
+```txt
+expected Kbatt:  [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.3224, -0.8474]
+actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.3224, -0.8474]
+```
+
+#### Third Attempt
+
+- do testing to determine an actual accuracy %
+- start introducing more noise into the curves until the accuracy starts to drop
+- Introduce some current noise? still do a full 1C discharge, but with slight noise, so the curves can no longer be perfect matches
+
 ### Third Generation Estimation (untouched)
 
 - Third generation will be where we start changing current throughout the discharge, since it will be rare that we will have a full, constant discharge curve.
 - This means that outputs will have both sag noise, and voltage noise.
+- The possiblity of calculating R0 is now introduced, since model 1 testing should see a linear scale in voltage drop based on current draw
 
 ### Fourth Generation Estimation (untouched)
 
