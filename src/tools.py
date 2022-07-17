@@ -37,13 +37,6 @@ def how_straight(a: np.ndarray) -> float:
 
     return integrate_subtract(a, np.ones(len(a)) * np.mean(a))
 
-# dummy RC values for testing
-dummy_RC = [
-    0.1,  # R1
-    5,    # C1
-    0.3,  # R2
-    500,  # C2
-]
 
 def soc_curve_k(k_param:list, resolution=200) -> tuple[np.ndarray]:
     sim = BattSim(guess_k, 1, *dummy_RC, soc=1.0, ModelID=1)
