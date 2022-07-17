@@ -8,7 +8,7 @@
 # - The first guess can be using Vo from the simulator, for a perfect-match test case
 # - The second run can be using Vout, the saggy loaded discharge curve
 
-from src.tools import derivative
+from src.tools import *
 import src.zsoc as zsoc
 import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
@@ -18,7 +18,7 @@ import numpy as np
 # Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
 
 
-def find_curve(V: np.ndarray, batteries: list[dict]):
+def find_curve(V: np.ndarray, batteries: list[dict]) -> dict:
     """
     find the curve that fits closest to the Vo of one of the batteries
     V: numpy array, volts
@@ -36,20 +36,16 @@ def find_curve(V: np.ndarray, batteries: list[dict]):
     dV = derivative(V, delta)
     dV2 = derivative(dV, delta)
 
-    # plt.plot(V, label='Vo')
-    # plt.plot(dV, label='dVo')
-    # plt.plot(dV2, label='d2Vo')
-    # plt.legend()
-    # plt.show()
-
     # find the closest match to the sample curve
 
     # diff contains tuple (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
     diff = np.array([
         (
-            # np.sum(np.abs(V - battery['Vo'])),
-            np.sum(np.abs(dV - battery['dV'])),
-            np.sum(np.abs(dV2 - battery['dV2'])),
+            # np.sum(np.abs(V - battery['Vo'])), # gen 1
+            # integrate_subtract(dV, battery['dV']), # gen 2.1
+            # integrate_subtract(dV2, battery['dV2']), # gen 2.1
+            # gen 2.2, account for noise, use first derivative
+            how_straight(V - battery['Vo']),
         ) for battery in batteries
     ])
 
@@ -84,59 +80,33 @@ if __name__ == '__main__':
 
     # simulate full discharge curve for the battery
     # discharge at 1C for 1h
+    delta = 3600 / 200  # using 200 points on everything
     I = np.ones(200) * sim_battery.Cbatt * -1
-    T = np.arange(0, 3600, 3600/200)
-    Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_v=0)
+    T = np.arange(0, 3600, delta)
+    Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
 
     # calculate first and second derivatives of all curves for use later
-    delta = 3600 / 200  # using 200 points on everything
 
-    for battery in batteries:
-        battery['dV'] = derivative(battery['Vo'], delta)
-        battery['dV2'] = derivative(battery['dV'], delta)
-
-    # # plot curves and derivatives for the sample battery
-    # fig, ax = plt.subplots(3, 1, sharex=True)
     # for battery in batteries:
-    #     ax[0].plot(battery['Vo'])
-    #     ax[1].plot(battery['dV'])
-    #     ax[2].plot(battery['dV2'])
-
-    # ax[0].title.set_text('Vo')
-    # ax[1].title.set_text('dVo')
-    # ax[2].title.set_text('d2Vo')
-    # fig.suptitle('Derivatives of Curves')
-    # ax[0].grid(True)
-    # ax[1].grid(True)
-    # ax[2].grid(True)
-    # plt.show()
-
-    # shuffle batteries so that test can start with a random battery
-    batteries = batteries[:]
-    np.random.shuffle(batteries)
+    #     battery['dV'] = derivative(battery['Vo'], delta)
+    #     battery['dV2'] = derivative(battery['dV'], delta)
 
     print('expected Kbatt:\t', target_battery['k'])
 
-    # Vo + Vbatt = Vout with voltage sag for a non noisy uniform load
+    # Vo + Vbatt = V with sag and noise
     V = Vo + Vbatt
-    # reverse V so slope is positive,
-    # assuming input V vector is a discharge curve
+    # reverse V so slope is positive, assuming input V vector is a discharge curve
     V = V[::-1]
-    print('actual Kbatt:\t', find_curve(V, batteries)['k'])
+    # dV = derivative(V, delta)
+    # dV2 = derivative(dV, delta)
 
-    dV = derivative(V, delta)
-    dV2 = derivative(dV, delta)
+    guess_k = find_curve(V, batteries)
+    print('actual Kbatt:\t', guess_k['k'])
 
-    # plot the expected and actual curves
-    fig, ax = plt.subplots(3, 1, sharex=True)
-    ax[0].plot(V, label='Vo + Vbatt')
-    ax[0].plot(target_battery['Vo'], label='expected Vo')
-    ax[1].plot(dV, label='dVo')
-    ax[1].plot(target_battery['dV'], label='expected dVo')
-    ax[2].plot(dV2, label='d2Vo')
-    ax[2].plot(target_battery['dV2'], label='expected d2Vo')
-    fig.suptitle('compare expected and actual curves')
-    for _ax in ax:
-        _ax.grid(True)
-        _ax.legend()
+    # plot the expected and actual curves for comparison
+    plt.plot(V, label='noisy loaded sample curve')
+    plt.plot(target_battery['Vo'], label='correct OCV curve')
+    plt.plot(Vo[::-1], label='guess OCV curve')
+    plt.title('compare expected and actual curves')
+    plt.legend()
     plt.show()
