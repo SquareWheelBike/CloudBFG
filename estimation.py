@@ -90,7 +90,7 @@ if __name__ == '__main__':
         delta = 3600 / 200  # using 200 points on everything
         I = np.ones(200) * sim_battery.Cbatt * -1
         T = np.arange(0, 3600, delta)
-        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T)
+        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_i=10**(-50/2))
 
         # calculate first and second derivatives of all curves for use later
 
