@@ -118,7 +118,7 @@ if __name__ == '__main__':
             ax[0].plot(Vo[::-1], label='guess OCV curve')
             ax[0].legend()
             ax[0].set_title('Voltage Curves')
-            ax[1].plot(I, label='noisy loaded sample curve')
+            ax[1].plot(Ibatt, label='noisy loaded sample curve')
             ax[1].set_title('Current Load')
             plt.show()
 
