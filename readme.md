@@ -98,8 +98,15 @@ actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.322
 #### Third Attempt
 
 - [x] do testing to determine an actual accuracy %
-- [ ] start introducing more noise into the curves until the accuracy starts to drop
+- [x] start introducing more noise into the curves until the accuracy starts to drop
 - [ ] Introduce some current noise? still do a full 1C discharge, but with slight noise, so the curves can no longer be perfect matches
+
+##### Results:
+
+- The accuracy has dropped to about 70%, with sigma_i and sigma_v noise being 10<sup>-2</sup>
+- Looking at the actual curve comparisons, the estimated OCV curves are still pretty close to the actual OCV curves
+
+![results_gen2_third_attempt](img/fig2_4.png)
 
 ### Third Generation Estimation (untouched)
 

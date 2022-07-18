@@ -90,7 +90,7 @@ if __name__ == '__main__':
         delta = 3600 / 200  # using 200 points on everything
         I = np.ones(200) * sim_battery.Cbatt * -1
         T = np.arange(0, 3600, delta)
-        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_i=10**(-50/2))
+        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_i=10**(-2), sigma_v=10**(-2))
 
         # calculate first and second derivatives of all curves for use later
 
@@ -110,13 +110,17 @@ if __name__ == '__main__':
         guess_batt = find_curve(V, batteries)
         # print('actual Kbatt:\t', guess_batt['k'])
 
-        # # plot the expected and actual curves for comparison
-        # plt.plot(V, label='noisy loaded sample curve')
-        # plt.plot(target_battery['Vo'], label='correct OCV curve')
-        # plt.plot(Vo[::-1], label='guess OCV curve')
-        # plt.title('compare expected and actual curves')
-        # plt.legend()
-        # plt.show()
+        # plot the expected and actual curves for comparison
+        if (i == 0):
+            fig, ax = plt.subplots(2, 1, sharex=True)
+            ax[0].plot(V, label='noisy loaded sample curve')
+            ax[0].plot(target_battery['Vo'], label='correct OCV curve')
+            ax[0].plot(Vo[::-1], label='guess OCV curve')
+            ax[0].legend()
+            ax[0].set_title('Voltage Curves')
+            ax[1].plot(I, label='noisy loaded sample curve')
+            ax[1].set_title('Current Load')
+            plt.show()
 
         correctness.append(all(a == b for a, b in zip(guess_batt['k'], target_battery['k'])))
         bar.next()
