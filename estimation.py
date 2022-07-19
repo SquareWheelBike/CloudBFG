@@ -54,6 +54,20 @@ def find_curve(V: np.ndarray, batteries: list[dict]) -> dict:
 
     return match
 
+# Estimating R0 allows us to remove voltage sag from a battery discharge curve,
+# and then use this offset to smooth out the curve.
+# This is useful for estimating the OCV curve for a loaded battery.
+def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
+    """
+    estimate the R0 of the battery, assuming a linear voltage sag
+
+    V: numpy array, volts
+    I: numpy array, amps
+
+    returns the R0 of the battery, in ohms
+    """
+    pass
+
 
 if __name__ == '__main__':
     # generate the curves for each of the sample k parameters using zsoc.py
