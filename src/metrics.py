@@ -17,3 +17,6 @@ def curve_accuracy(guess_k: list, target_k: dict) -> float:
     """
 
     return integrate_subtract(soc_curve_k(guess_k, 200)[0], soc_curve_k(target_k, 200)[0])
+
+# could also try comparing how close the zsoc curve chosen is to the noisy sample curve (perform curve_accuracy on the noisy curve and the guess k parameter curves
+
