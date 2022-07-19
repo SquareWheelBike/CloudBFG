@@ -64,7 +64,7 @@ if __name__ == '__main__':
     # test a bunch of times
     TESTS = 400
 
-    correctness = [] # list of bools of whether a guess was correct
+    correctness = []  # list of bools of whether a guess was correct
     from progress.bar import Bar
     bar = Bar('Testing', max=TESTS)
     for i in range(TESTS):
@@ -90,7 +90,8 @@ if __name__ == '__main__':
         delta = 3600 / 200  # using 200 points on everything
         I = np.ones(200) * sim_battery.Cbatt * -1
         T = np.arange(0, 3600, delta)
-        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(I, T, sigma_i=10**(-2), sigma_v=10**(-2))
+        Vbatt, Ibatt, soc, Vo = sim_battery.simulate(
+            I, T, sigma_i=10**(-2), sigma_v=10**(-2))
 
         # calculate first and second derivatives of all curves for use later
 
@@ -122,7 +123,8 @@ if __name__ == '__main__':
             ax[1].set_title('Current Load')
             plt.show()
 
-        correctness.append(all(a == b for a, b in zip(guess_batt['k'], target_battery['k'])))
+        correctness.append(all(a == b for a, b in zip(
+            guess_batt['k'], target_battery['k'])))
         bar.next()
     bar.finish()
 
