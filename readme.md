@@ -28,7 +28,7 @@ Acceptable accuracy is 90% or more
 
 Since this is ideal-case, as soon as estimation was working, it was 100% accurate.
 
-### Second Generation Estimation (ongoing)
+### Second Generation Estimation (completed)
 
 - Second generation fitting will be done with noisy Vout curves
 - This means that curve fitting will happen on the samples first, and then the clean curves will be compared to the sample set
@@ -99,12 +99,13 @@ actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.322
 
 - [x] do testing to determine an actual accuracy %
 - [x] start introducing more noise into the curves until the accuracy starts to drop
-- [ ] Introduce some current noise? still do a full 1C discharge, but with slight noise, so the curves can no longer be perfect matches
+- [x] Introduce some current noise? still do a full 1C discharge, but with slight noise, so the curves can no longer be perfect matches
 
 ##### Results:
 
 - The accuracy has dropped to about 70%, with sigma_i and sigma_v noise being 10<sup>-2</sup>
 - Looking at the actual curve comparisons, the estimated OCV curves are still pretty close to the actual OCV curves
+- As of this third attempt, all of the features of Gen 2 estimation have been accomplished. Moving to Gen 3
 
 ![results_gen2_third_attempt](img/fig2_4.png)
 
