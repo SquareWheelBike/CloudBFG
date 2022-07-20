@@ -134,7 +134,7 @@ if __name__ == '__main__':
         guess_batt = find_curve(V, batteries)
 
         # # plot the expected and actual curves for comparison (first one only)
-        if (i == 0):
+        if (i == 0 and False):
             fig, ax = plt.subplots(2, 1, sharex=True)
             ax[0].plot(Vnoisy, label='noisy loaded sample curve')
             ax[0].plot(target_battery['Vo'], label='correct OCV curve')

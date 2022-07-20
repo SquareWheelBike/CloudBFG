@@ -125,7 +125,16 @@ actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.322
 ##### Results:
 
 - Estimated R0 using least square estimation
-- Results saw an average error of 4.39%, which I consider accurate enough to be used in the next generation of estimation
+- Results saw an average error of 1.8%, which I consider accurate enough to be used in the next generation of estimation
+
+A sine wave was used to simulate a non-constant current load, and the OCV curve was estimated using the loaded discharge curve and the estimated R0. From this OCV curve, the K parameters were estimated.
+
+```txt
+K error : 1.05%
+R0 error : 1.79%
+```
+
+![results_gen3_first_attempt](img/fig3_1.png)
 
 ### Fourth Generation Estimation (untouched)
 
