@@ -122,6 +122,11 @@ actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.322
   - Once R0 is known, we can use it to estimate an OCV curve for a loaded discharge curve
   - This unloaded discharge curve will be used to estimate the K parameters of the battery, using Gen 2 estimation
 
+##### Results:
+
+- Estimated R0 using least square estimation
+- Results saw an average error of 4.39%, which I consider accurate enough to be used in the next generation of estimation
+
 ### Fourth Generation Estimation (untouched)
 
 - Incomplete curves will hopefully be able to be used, since it will be rare that a full discharge curve will be available.
