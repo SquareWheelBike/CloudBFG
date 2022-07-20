@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
 import src.BattSim.CurrentSIM as CurrentSIM
 import numpy as np
+from src.metrics import *
 
 # Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
 
@@ -24,7 +25,7 @@ def find_curve(V: np.ndarray, batteries: list[dict]) -> dict:
     V: numpy array, volts
     batteries: list of dictionaries, battery cache from zsoc.py
 
-    returns the Kbatt of the battery that matches the data
+    returns the dict battery cache object of the battery that matches the data
     """
 
     # this will NOT WORK if the datapoints being used are not numpy arrays
@@ -70,10 +71,8 @@ def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
     returns the R0 of the battery, in ohms
     """
 
-    # Ax + n = b
+    # Ax0 + nx1 = b
     # I*R0 + 1*Vo = Vbatt
-    # I, Vbatt are known; solve for R0
-    # x0 = I, x1 = 1
 
     # for a, column 1 is I and column 2 is 1's
     A = np.array([I, np.ones(len(I))]).T
@@ -94,7 +93,7 @@ if __name__ == '__main__':
     # test a bunch of times
     TESTS = 400
     RESOLUTION = 400
-    delta = 3600 / RESOLUTION # 1 hour, split into RESOLUTION points
+    delta = 3600 / RESOLUTION  # 1 hour, split into RESOLUTION points
 
     sigma_i = 0
     sigma_v = 0
@@ -107,7 +106,7 @@ if __name__ == '__main__':
         battery['dV'] = derivative(battery['Vo'], delta)
         battery['dV2'] = derivative(battery['dV'], delta)
 
-    k_accuracy = []  # list of bools of whether a guess was correct
+    k_error = []  # list of bools of whether a guess was correct
     r0_error = []  # list of R0 errors
     from progress.bar import Bar
     bar = Bar('Testing', max=TESTS)
@@ -150,34 +149,36 @@ if __name__ == '__main__':
         # dV = derivative(V, delta)
         # dV2 = derivative(dV, delta)
 
+        r0 = estimate_R0(V, I)
+        r0_error.append(
+            percent_error(np.array([r0]), np.array([target_battery['R0']]))
+        )
+
+        # apply the R0 offset to the Vo curve
+        Vnoisy = V
+        V = V - r0 * I
+
         guess_batt = find_curve(V, batteries)
 
         # # plot the expected and actual curves for comparison (first one only)
         if (i == 0):
             fig, ax = plt.subplots(2, 1, sharex=True)
-            ax[0].plot(V, label='noisy loaded sample curve')
+            ax[0].plot(Vnoisy, label='noisy loaded sample curve')
             ax[0].plot(target_battery['Vo'], label='correct OCV curve')
-            ax[0].plot(Vo[::-1], label='guess OCV curve')
+            ax[0].plot(V, label='Sag removed V curve')
+            ax[0].plot(guess_batt['Vo'], label='guess OCV curve')
             ax[0].legend()
             ax[0].set_title('Voltage Curves')
             ax[1].plot(Ibatt, label='noisy loaded sample curve')
             ax[1].set_title('Current Load')
             plt.show()
 
-        k_accuracy.append(all(a == b for a, b in zip(
-            guess_batt['k'], target_battery['k'])))
+        k_error.append(percent_error(
+            guess_batt['Vo'], target_battery['Vo']))
 
-        r0 = estimate_R0(V, I)
-
-        if (i == 0):
-            print('R0:\t', r0)
-            print('R0 expected:\t', target_battery['R0'])
-            print('R0 error:\t', r0 - target_battery['R0'])
-        r0_error.append(
-            np.abs(r0 - target_battery['R0']) / target_battery['R0']
-        )
         bar.next()
+
     bar.finish()
 
-    print(f'correctness : {sum(k_accuracy)/len(k_accuracy)*100}%')
+    print(f'K error : {round(sum(k_error)/len(k_error)*100, 2)}%')
     print(f'R0 error : {round(sum(r0_error)/len(r0_error)*100, 2)}%')
