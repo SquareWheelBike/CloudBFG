@@ -109,11 +109,32 @@ actual Kbatt:    [-4.4256, 83.6175, -14.0185, 1.4878, -0.0678, -64.5844, 118.322
 
 ![results_gen2_third_attempt](img/fig2_4.png)
 
-### Third Generation Estimation (untouched)
+### Third Generation Estimation (ongoing)
 
 - Third generation will be where we start changing current throughout the discharge, since it will be rare that we will have a full, constant discharge curve.
 - This means that outputs will have both sag noise, and voltage noise.
 - The possiblity of calculating R0 is now introduced, since model 1 testing should see a linear scale in voltage drop based on current draw
+
+#### First Attempt
+
+- Start by creating a non constant current load, for instance, oscillating between 1C and 2C. See how this affects the OCV curve estimation
+- Using Model 1 data, create an estimation of R0
+  - Once R0 is known, we can use it to estimate an OCV curve for a loaded discharge curve
+  - This unloaded discharge curve will be used to estimate the K parameters of the battery, using Gen 2 estimation
+
+##### Results:
+
+- Estimated R0 using least square estimation
+- Results saw an average error of 1.8%, which I consider accurate enough to be used in the next generation of estimation
+
+A sine wave was used to simulate a non-constant current load, and the OCV curve was estimated using the loaded discharge curve and the estimated R0. From this OCV curve, the K parameters were estimated.
+
+```txt
+K error : 1.05%
+R0 error : 1.79%
+```
+
+![results_gen3_first_attempt](img/fig3_1.png)
 
 ### Fourth Generation Estimation (untouched)
 
