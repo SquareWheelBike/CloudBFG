@@ -1,13 +1,3 @@
-# ## First Generation Estimation
-
-# - [x] start by generating the curves for each of the sample k parameters using zsoc.py
-# - [x] Generate a full discharge curve (no noise) for a battery with matching k parameters to the sample curves
-# - [x] for each of the sample curves, and the sample curve, determine the rate of change throughout the curve
-# - [x] the best guess for which curve is the best fit is the one with the closest rate of change to the sample curve
-
-# - The first guess can be using Vo from the simulator, for a perfect-match test case
-# - The second run can be using Vout, the saggy loaded discharge curve
-
 from src.tools import *
 import src.zsoc as zsoc
 import matplotlib.pyplot as plt
@@ -15,8 +5,6 @@ from src.BattSim.BattSim import BattSim
 import src.BattSim.CurrentSIM as CurrentSIM
 import numpy as np
 from src.metrics import *
-
-# Now that we have the full discharge curve of the battery, we can try to match it to one of the sample curves
 
 
 def find_curve(V: np.ndarray, batteries: list[dict]) -> dict:
@@ -32,20 +20,11 @@ def find_curve(V: np.ndarray, batteries: list[dict]) -> dict:
     assert(type(V) is np.ndarray)
     assert(all(type(battery['Vo']) is np.ndarray for battery in batteries))
 
-    # find the rate of change of the Vo curve
-    delta = 3600 / 200  # using 200 points on everything
-    dV = derivative(V, delta)
-    dV2 = derivative(dV, delta)
-
     # find the closest match to the sample curve
 
-    # diff contains tuple (V, dV, dV2) curve differences between the sample to each target curve for each sample battery
+    # diff contains tuple (V,) curve differences between the sample to each target curve for each sample battery
     diff = np.array([
         (
-            # np.sum(np.abs(V - battery['Vo'])), # gen 1
-            # integrate_subtract(dV, battery['dV']), # gen 2.1
-            # integrate_subtract(dV2, battery['dV2']), # gen 2.1
-            # gen 2.2, account for noise, use first derivative
             how_straight(V - battery['Vo']),
         ) for battery in batteries
     ])
@@ -115,7 +94,6 @@ if __name__ == '__main__':
         target_battery = batteries[np.random.randint(0, len(batteries))]
 
         # run the chosen sample battery through the BattSim simulator to introduce noise
-        # Kbatt: list, Cbatt: float, R0: float, R1: float, C1: float, R2: float, C2: float, ModelID:int, soc:float=0.5
         Cbatt = 2
         sim_battery = BattSim(
             Kbatt=target_battery['k'],
@@ -130,34 +108,29 @@ if __name__ == '__main__':
         )  # note that only the Kbatt and soc is used for the simulation, the rest of the parameters are dummy values
 
         # simulate full discharge curve for the battery
-        # discharge at 1C for 1h
         # let I be a sine wave, offset for non constant discharge
         cycles = 5
         I = np.sin(np.linspace(0, 2*np.pi*cycles, RESOLUTION)) * Cbatt - Cbatt
-        # I = np.ones(RESOLUTION) * sim_battery.Cbatt * -1
         T = np.arange(0, delta * RESOLUTION, delta)
         Vbatt, Ibatt, soc, Vo = sim_battery.simulate(
             I, T, sigma_i=sigma_i, sigma_v=sigma_v)
 
-        # print('expected Kbatt:\t', target_battery['k'])
-
-        # Vo + Vbatt = V with sag and noise
+        # add sag and noise to OCV curve
         V = Vo + Vbatt
         # reverse V so slope is positive, assuming input V vector is a discharge curve
         V = V[::-1]
         I = Ibatt[::-1]
-        # dV = derivative(V, delta)
-        # dV2 = derivative(dV, delta)
 
         r0 = estimate_R0(V, I)
         r0_error.append(
             percent_error(np.array([r0]), np.array([target_battery['R0']]))
         )
 
-        # apply the R0 offset to the Vo curve
+        # apply the I*R0 load offset to the loaded curve
         Vnoisy = V
         V = V - r0 * I
 
+        # find the closest match to the sample curve
         guess_batt = find_curve(V, batteries)
 
         # # plot the expected and actual curves for comparison (first one only)
@@ -165,16 +138,15 @@ if __name__ == '__main__':
             fig, ax = plt.subplots(2, 1, sharex=True)
             ax[0].plot(Vnoisy, label='noisy loaded sample curve')
             ax[0].plot(target_battery['Vo'], label='correct OCV curve')
-            ax[0].plot(V, label='Sag removed V curve')
-            ax[0].plot(guess_batt['Vo'], label='guess OCV curve')
+            ax[0].plot(V, label='load compensated curve')
+            ax[0].plot(guess_batt['Vo'], label='estimated OCV curve')
             ax[0].legend()
             ax[0].set_title('Voltage Curves')
             ax[1].plot(Ibatt, label='noisy loaded sample curve')
             ax[1].set_title('Current Load')
             plt.show()
 
-        k_error.append(percent_error(
-            guess_batt['Vo'], target_battery['Vo']))
+        k_error.append(percent_error(guess_batt['Vo'], target_battery['Vo']))
 
         bar.next()
 
