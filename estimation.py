@@ -50,21 +50,19 @@ def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
     returns the R0 of the battery, in ohms
     """
 
-    # Ax0 + nx1 = b
+    # A*x0 + n*x1 = b
     # I*R0 + 1*Vo = Vbatt
+    # V should contain Vbatt, I should contain Ibatt. We can use these to estimate R0 using least squares
 
-    # for a, column 1 is I and column 2 is 1's
-    A = np.array([I, np.ones(len(I))]).T
+    # for A, column 1 is I and column 2 is 1's
+    A = np.array([I, np.ones(len(I))]).transpose()
     # for b, only one column is V
     b = V
 
     # solve the system of linear equations using least squares
-    x = np.linalg.lstsq(A, b, rcond=None)[0]
+    R0, Vo = np.linalg.lstsq(A, b, rcond=None)[0]
 
-    # R0 should be constant throughout the vector
-    return x[0]
-
-    # pass
+    return R0
 
 
 if __name__ == '__main__':
