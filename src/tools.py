@@ -1,5 +1,5 @@
 import numpy as np
-from BattSim.BattSim import BattSim
+from src.BattSim.BattSim import BattSim
 
 
 def derivative(L: np.ndarray, dt: float = 1) -> np.ndarray:
