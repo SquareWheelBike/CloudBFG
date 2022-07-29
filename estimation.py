@@ -98,6 +98,7 @@ if __name__ == '__main__':
     TESTS = 400
     RESOLUTION = 400
     delta = 3600 / RESOLUTION  # 1 hour, split into RESOLUTION points
+    GRAPHS = False
 
     sigma_i = 0
     sigma_v = 0
@@ -159,7 +160,7 @@ if __name__ == '__main__':
         guess_batt = find_curve(V, batteries)
 
         # # plot the expected and actual curves for comparison (first one only)
-        if (i == 0 and False):
+        if (i == 0 and GRAPHS):
             fig, ax = plt.subplots(2, 1, sharex=True)
             ax[0].plot(Vnoisy, label='noisy loaded sample curve')
             ax[0].plot(target_battery['Vo'], label='correct OCV curve')
