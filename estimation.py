@@ -65,6 +65,33 @@ def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
     return R0
 
 
+def estimate_soc_instantaneous(V: float, I: float, k: list[float], R0: float = 0) -> float:
+    """
+    estimate the soc of a battery at a given instantenous voltage and current
+
+    V: float, volts
+    I: float, amps
+    k: list of floats, k-parameters of the battery
+    R0: float, optional, ohms, offset to remove voltage sag from the battery discharge curve
+
+    returns the soc of the battery at the given instantenous voltage and current
+    """
+    RESOLUTION = 200
+    # first generation of this will just generate the entire curve and do a lookup
+
+    # start by compensating for the voltage sag
+    V = V - I * R0
+
+    batt = zsoc.OCV_curve(k, resolution=RESOLUTION)
+    Vo = batt['Vo']
+    soc = batt['zsoc']
+
+    # find the index of the value in Vo that most closely matches the given voltage
+    position = np.argmin(Vo - np.ones(RESOLUTION) * V)
+
+    return soc[position]
+
+
 if __name__ == '__main__':
 
     # test a bunch of times
