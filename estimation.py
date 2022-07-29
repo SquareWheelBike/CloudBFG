@@ -1,6 +1,6 @@
 from src.tools import *
 import src.zsoc as zsoc
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
 import src.BattSim.CurrentSIM as CurrentSIM
 import numpy as np
@@ -113,6 +113,7 @@ if __name__ == '__main__':
 
     k_error = []  # list of bools of whether a guess was correct
     r0_error = []  # list of R0 errors
+    soc_error = []  # list of soc errors
     from progress.bar import Bar
     bar = Bar('Testing', max=TESTS)
     for i in range(TESTS):
@@ -174,9 +175,16 @@ if __name__ == '__main__':
 
         k_error.append(percent_error(guess_batt['Vo'], target_battery['Vo']))
 
+        # estimate the soc of the battery at the given instantenous voltage and current
+        position = np.random.randint(0, RESOLUTION)
+        soc_error.append(
+            abs(estimate_soc_instantaneous(V[position], I[position], target_battery['k'], R0=r0) - target_battery['zsoc'][position])
+        )
+
         bar.next()
 
     bar.finish()
 
     print(f'K error : {round(sum(k_error)/len(k_error)*100, 2)}%')
     print(f'R0 error : {round(sum(r0_error)/len(r0_error)*100, 2)}%')
+    print(f'SOC error : {round(sum(soc_error)/len(soc_error)*100, 2)}%')
