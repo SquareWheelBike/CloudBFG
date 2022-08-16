@@ -4,6 +4,8 @@ This is a cloud-based AI implementation of an SoC characterization algorithm.
 
 Initial meeting notes can be found [here](notes.md).
 
+Test dataset is available [here](https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830), from Carnegie Mellon University.
+
 ## TODO
 
 - Curve fitting is not efficient as it is now, it will need to be redone eventually using least squares, rather than a cache.
