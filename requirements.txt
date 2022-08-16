@@ -3,3 +3,5 @@ matplotlib
 progressbar2
 tensorflow-cpu
 progress
+wget
+requests
