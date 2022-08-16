@@ -5,3 +5,4 @@ BattSim/__pycache__/
 ~$*
 res/zsoc_curves
 *.pyc
+res/*.zip
