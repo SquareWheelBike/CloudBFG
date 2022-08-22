@@ -7,4 +7,4 @@ res/zsoc_curves
 *.pyc
 res/*.zip
 res/dataset
-AESS
+AESS*
