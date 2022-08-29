@@ -128,6 +128,61 @@ def generate_curves(inputfile: str, outputfolder: str = None, decimals: int = 4,
     return batteries
 
 
+def OCV_curve(Kbatt: list, resolution: int = 100) -> dict:
+    """
+    Generates a single battery's OCV curve.
+
+    :param Kbatt: The list of coefficients for the OCV curve. Kbatt[8] is the series resistance, if included, else defaults to 0
+    :param resolution: The number of samples/points to generate across the zsoc curve.
+
+    Each dictionary contains the following keys:
+    'sample' : str sample name,
+    'manufacturer' : str manufacturer name,
+    'serial' : str serial number,
+    'cell' : str cell number (series position),
+    'k' : list of floats, OCV curve coefficients,
+    'R0' : float, series internal resistance,
+    'zsoc' : np.ndarray of floats, zsoc values,
+    'Vo' : np.ndarray of floats, Vo (OCV voltage) values
+
+    """
+
+    # DECIMALS = decimals
+    NPOINTS = resolution
+
+    def __scaling_fwd(x, x_min, x_max, E):
+        return (1 - 2 * E) * (x - x_min) / (x_max - x_min) + E
+
+    # determination of OCV (generate Vo
+    l = NPOINTS
+    zsoc = np.linspace(0, 1, l)
+    zsoc = __scaling_fwd(zsoc, 0, 1, 0.175)
+
+    Vo = np.zeros(l)  # create Vo (OCV voltage vector)
+
+    for k, zk in enumerate(zsoc):
+        Vo[k] = Kbatt[0]\
+            + Kbatt[1] / zk\
+            + Kbatt[2] / zk ** 2\
+            + Kbatt[3] / zk ** 3\
+            + Kbatt[4] / zk ** 4\
+            + Kbatt[5] * zk\
+            + Kbatt[6] * log(zk)\
+            + Kbatt[7] * log(1 - zk)
+
+
+    # convert from list of lists to list of dictionaries (cleaner to work with)
+    # NOTE: entry 12 is the NINTH k-parameter, but I am truncating it for now
+    battery = {
+        'k': np.array([float(x) for x in Kbatt[:8]]),
+        'R0': float(entry[8]) if len(Kbatt) > 8 else 0,
+        'zsoc': zsoc,
+        'Vo': Vo
+    }
+
+    return battery
+
+
 if __name__ == '__main__':
     INPUTFILE = '../res/K_para.csv'
     OUTPUTFOLDER = '../res/zsoc_curves'
