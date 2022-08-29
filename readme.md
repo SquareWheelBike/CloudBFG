@@ -4,6 +4,14 @@ This is a cloud-based AI implementation of an SoC characterization algorithm.
 
 Initial meeting notes can be found [here](notes.md).
 
+Test dataset is available [here](https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830), from Carnegie Mellon University.
+
+## TODO
+
+- Curve fitting is not efficient as it is now, it will need to be redone eventually using least squares, rather than a cache.
+  - This will be *fourth generation* estimation
+- SOC estimation needs to be done in a more efficient way. Right now, it generates the whole OCV curve and then looks up the current terminal voltage in that table. We need to be able to do a calulcation just from the current voltage, knowing R0 and the eight k-parameters.
+
 ## OCV Curves
 
 The first version of the CloudBFG estimation algorithm will use a cache of pre-computed OCV curves.
@@ -139,4 +147,31 @@ R0 error : 1.79%
 ### Fourth Generation Estimation (untouched)
 
 - Incomplete curves will hopefully be able to be used, since it will be rare that a full discharge curve will be available.
-- This is a lesser priority, since it is reasonable to request a full curve, although it will be difficult to collect from general use statistics.
+- This generation can be where using linalg.lstsq is used to estimate the K parameters of the battery, as this is how Bala does it.
+- Starting from a known SOC (perhaps 100%), use the coulomb counting method to collect Vout and Iout data. This will be used to estimate the K parameters of the battery.
+- Estimations will need a way to be verified
+
+## R0 Estimation
+
+R0 estimation is done using least squares estimation, `I*R0 + 1*Vo = Vbatt`. Knowing only I and Vbatt, we can estimate R0 and Vo.
+
+## SOC Estimation
+
+- The SOC estimation will need to be computationally simple and memory efficient if it is to be used in a real-time system
+- Just as with curve fitting, SOC estimation will be developed in stages
+- Since R0 estimation is working, we can account for voltage sag in the SOC estimation
+
+### First Generation: Table Lookups
+
+- Generate the full OCV-SOC curve, and then look up the SOC for each voltage point.
+- This method is simple and easy, but it is not memory efficient, and takes time to generate the full curve
+
+### Second Generation: Mathematically
+
+- Since we know the full algorithm for OCV curve generation, if we know Vo and k, we can estimate the SOC mathematically and instantly
+
+The full equation is:
+
+```txt
+V = k0 * 1 + k1 * 1/soc + k2 * soc + k3 / soc ^ 2 + k4 / soc ^ 3 + k5 / soc ^ 4 + k6 * ln(soc) + k7 * ln(1 - soc)
+```

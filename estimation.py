@@ -1,6 +1,6 @@
 from src.tools import *
 import src.zsoc as zsoc
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
 import src.BattSim.CurrentSIM as CurrentSIM
 import numpy as np
@@ -65,12 +65,40 @@ def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
     return R0
 
 
+def estimate_soc_instantaneous(V: float, I: float, k: list[float], R0: float = 0) -> float:
+    """
+    estimate the soc of a battery at a given instantenous voltage and current
+
+    V: float, volts
+    I: float, amps
+    k: list of floats, k-parameters of the battery
+    R0: float, optional, ohms, offset to remove voltage sag from the battery discharge curve
+
+    returns the soc of the battery at the given instantenous voltage and current
+    """
+    RESOLUTION = 200
+    # first generation of this will just generate the entire curve and do a lookup
+
+    # start by compensating for the voltage sag
+    V = V - I * R0
+
+    batt = zsoc.OCV_curve(k, resolution=RESOLUTION)
+    Vo = batt['Vo']
+    soc = batt['zsoc']
+
+    # find the index of the value in Vo that most closely matches the given voltage
+    position = np.argmin(Vo - np.ones(RESOLUTION) * V)
+
+    return soc[position]
+
+
 if __name__ == '__main__':
 
     # test a bunch of times
     TESTS = 400
     RESOLUTION = 400
     delta = 3600 / RESOLUTION  # 1 hour, split into RESOLUTION points
+    GRAPHS = False
 
     sigma_i = 0
     sigma_v = 0
@@ -85,6 +113,7 @@ if __name__ == '__main__':
 
     k_error = []  # list of bools of whether a guess was correct
     r0_error = []  # list of R0 errors
+    soc_error = []  # list of soc errors
     from progress.bar import Bar
     bar = Bar('Testing', max=TESTS)
     for i in range(TESTS):
@@ -132,7 +161,7 @@ if __name__ == '__main__':
         guess_batt = find_curve(V, batteries)
 
         # # plot the expected and actual curves for comparison (first one only)
-        if (i == 0 and False):
+        if (i == 0 and GRAPHS):
             fig, ax = plt.subplots(2, 1, sharex=True)
             ax[0].plot(Vnoisy, label='noisy loaded sample curve')
             ax[0].plot(target_battery['Vo'], label='correct OCV curve')
@@ -146,9 +175,16 @@ if __name__ == '__main__':
 
         k_error.append(percent_error(guess_batt['Vo'], target_battery['Vo']))
 
+        # estimate the soc of the battery at the given instantenous voltage and current
+        position = np.random.randint(0, RESOLUTION)
+        soc_error.append(
+            abs(estimate_soc_instantaneous(V[position], I[position], target_battery['k'], R0=r0) - target_battery['zsoc'][position])
+        )
+
         bar.next()
 
     bar.finish()
 
     print(f'K error : {round(sum(k_error)/len(k_error)*100, 2)}%')
     print(f'R0 error : {round(sum(r0_error)/len(r0_error)*100, 2)}%')
+    print(f'SOC error : {round(sum(soc_error)/len(soc_error)*100, 2)}%')
