@@ -65,7 +65,7 @@ def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
     return R0
 
 
-def estimate_soc_instantaneous(V: float, I: float, k: list[float], R0: float = 0) -> float:
+def estimate_soc(V: float,  k: iter[float], I: float = 0, R0: float = 0) -> float:
     """
     estimate the soc of a battery at a given instantenous voltage and current
 
@@ -74,22 +74,42 @@ def estimate_soc_instantaneous(V: float, I: float, k: list[float], R0: float = 0
     k: list of floats, k-parameters of the battery
     R0: float, optional, ohms, offset to remove voltage sag from the battery discharge curve
 
-    returns the soc of the battery at the given instantenous voltage and current
+    returns the soc of the battery at the given instantenous voltage and current using bisection root finding
     """
-    RESOLUTION = 200
+
     # first generation of this will just generate the entire curve and do a lookup
 
-    # start by compensating for the voltage sag
+    # start by compensating for the voltage sag, if given
     V = V - I * R0
 
-    batt = zsoc.OCV_curve(k, resolution=RESOLUTION)
-    Vo = batt['Vo']
-    soc = batt['zsoc']
+    k = np.array(k)
 
-    # find the index of the value in Vo that most closely matches the given voltage
-    position = np.argmin(Vo - np.ones(RESOLUTION) * V)
+    # each iteration is a resolution of 2 ** n
+    ITERATIONS = 10
 
-    return soc[position]
+    def Vo(soc: float) -> float:
+        def __scaling_fwd(x, x_min, x_max, E):
+            return (1 - 2 * E) * (x - x_min) / (x_max - x_min) + E
+        ones = np.ones(len(soc)) if len(soc) > 1 else 1
+        soc = __scaling_fwd(soc, 0, 1, 0.175)
+        return np.sum(
+            np.array([ones, soc, 1 / soc, 1 / soc ** 2, 1 / soc ** 3,
+                     1 / soc ** 4, np.log(soc), np.log(1 - soc)]).T * k,
+            axis=1
+        )
+
+    # find the soc that matches the voltage
+    upper = 1
+    lower = 0
+    soc = (upper + lower) / 2
+    for i in range(ITERATIONS):
+        if Vo(soc) > V:
+            upper = soc
+        else:
+            lower = soc
+        soc = (upper + lower) / 2
+
+    return soc
 
 
 if __name__ == '__main__':
@@ -178,7 +198,8 @@ if __name__ == '__main__':
         # estimate the soc of the battery at the given instantenous voltage and current
         position = np.random.randint(0, RESOLUTION)
         soc_error.append(
-            abs(estimate_soc_instantaneous(V[position], I[position], target_battery['k'], R0=r0) - target_battery['zsoc'][position])
+            abs(estimate_soc(V=V[position], I=I[position], k=target_battery['k'],
+                R0=r0) - target_battery['zsoc'][position])
         )
 
         bar.next()
