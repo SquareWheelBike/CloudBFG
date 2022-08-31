@@ -1,0 +1,1 @@
+when the 'zsoc' keys are generated, the values stored in the batteries are still linearly scaled; this should not be stored. The values stored should range from 0 -> 1, and be linearly scaled ONLY when needed, else the production unit will estimate 0% battery as 17.5%.
