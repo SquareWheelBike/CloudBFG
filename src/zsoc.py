@@ -8,6 +8,7 @@ import csv
 import numpy as np
 import os
 from math import log
+from scaling import *
 
 
 def generate_curves(inputfile: str, outputfolder: str = None, decimals: int = 4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100) -> list[dict]:
@@ -68,23 +69,18 @@ def generate_curves(inputfile: str, outputfolder: str = None, decimals: int = 4,
 
         print('Output folder setup complete.') if verbose else None
 
-    def __scaling_fwd(x, x_min, x_max, E):
-        return (1 - 2 * E) * (x - x_min) / (x_max - x_min) + E
-
     # determination of OCV (generate Vo
     l = NPOINTS
     zsoc = np.linspace(0, 1, l)
-    zsoc = __scaling_fwd(zsoc, 0, 1, 0.175)
     K_para[0].append('zsoc')
     K_para[0].append('Vo')
-    # print('zsoc:', zsoc)
     for entry in K_para[1:]:
         print('Generating zsoc curve for battery',
               entry[0], entry[1:]) if verbose else None
         Kbatt = list(map(float, entry[4:12]))
         Vo = np.zeros(l)  # create Vo (OCV voltage vector)
 
-        for k, zk in enumerate(zsoc):
+        for k, zk in enumerate(scaling_fwd(zsoc, 0, 1, 0.175)):
             Vo[k] = Kbatt[0]\
                 + Kbatt[1] / zk\
                 + Kbatt[2] / zk ** 2\
@@ -150,17 +146,13 @@ def OCV_curve(Kbatt: list, resolution: int = 100) -> dict:
     # DECIMALS = decimals
     NPOINTS = resolution
 
-    def __scaling_fwd(x, x_min, x_max, E):
-        return (1 - 2 * E) * (x - x_min) / (x_max - x_min) + E
-
     # determination of OCV (generate Vo
     l = NPOINTS
     zsoc = np.linspace(0, 1, l)
-    zsoc = __scaling_fwd(zsoc, 0, 1, 0.175)
 
     Vo = np.zeros(l)  # create Vo (OCV voltage vector)
 
-    for k, zk in enumerate(zsoc):
+    for k, zk in enumerate(scaling_fwd(zsoc, 0, 1, 0.175)):
         Vo[k] = Kbatt[0]\
             + Kbatt[1] / zk\
             + Kbatt[2] / zk ** 2\
