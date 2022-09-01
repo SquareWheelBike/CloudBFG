@@ -8,7 +8,7 @@ import csv
 import numpy as np
 import os
 from math import log
-from scaling import *
+from src.scaling import *
 
 
 def generate_curves(inputfile: str, outputfolder: str = None, decimals: int = 4, generate_csv: bool = True, verbose: bool = False, resolution: int = 100) -> list[dict]:
