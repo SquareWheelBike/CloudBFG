@@ -1,6 +1,6 @@
 from src.tools import *
 import src.zsoc as zsoc
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from src.BattSim.BattSim import BattSim
 import src.BattSim.CurrentSIM as CurrentSIM
 import numpy as np
@@ -17,8 +17,8 @@ def find_curve(V: np.ndarray, batteries: list[dict]) -> dict:
     """
 
     # this will NOT WORK if the datapoints being used are not numpy arrays
-    assert(type(V) is np.ndarray)
-    assert(all(type(battery['Vo']) is np.ndarray for battery in batteries))
+    assert (type(V) is np.ndarray)
+    assert (all(type(battery['Vo']) is np.ndarray for battery in batteries))
 
     # find the closest match to the sample curve
 
@@ -65,7 +65,7 @@ def estimate_R0(V: np.ndarray, I: np.ndarray) -> float:
     return R0
 
 
-def estimate_soc_instantaneous(V: float, I: float, k: list[float], R0: float = 0) -> float:
+def estimate_soc(V: float,  k: iter, I: float = 0, R0: float = 0) -> float:
     """
     estimate the soc of a battery at a given instantenous voltage and current
 
@@ -74,22 +74,39 @@ def estimate_soc_instantaneous(V: float, I: float, k: list[float], R0: float = 0
     k: list of floats, k-parameters of the battery
     R0: float, optional, ohms, offset to remove voltage sag from the battery discharge curve
 
-    returns the soc of the battery at the given instantenous voltage and current
+    returns the soc of the battery at the given instantenous voltage and current using bisection root finding
     """
-    RESOLUTION = 200
+
     # first generation of this will just generate the entire curve and do a lookup
 
-    # start by compensating for the voltage sag
+    # start by compensating for the voltage sag, if given
     V = V - I * R0
 
-    batt = zsoc.OCV_curve(k, resolution=RESOLUTION)
-    Vo = batt['Vo']
-    soc = batt['zsoc']
+    k = np.array(k)
 
-    # find the index of the value in Vo that most closely matches the given voltage
-    position = np.argmin(Vo - np.ones(RESOLUTION) * V)
+    # each iteration is a resolution of 2 ** n
+    ITERATIONS = 10
 
-    return soc[position]
+    def Vo(_soc: float) -> float:
+        # _soc = (1 - 2 * 0.175) * _soc / 1 + 0.175
+        return np.sum(
+            np.array([1, 1 / _soc, 1 / _soc ** 2, 1 / _soc ** 3,
+                     1 / _soc ** 4, _soc, np.log(_soc), np.log(1 - _soc)]) * k
+        )
+
+    # find the soc that matches the voltage
+    upper = 1
+    lower = 0
+    soc = (upper + lower) / 2
+    for i in range(ITERATIONS):
+        # print(f'{i} {soc} {Vo(soc)}')
+        if Vo(soc) > V:
+            upper = soc
+        else:
+            lower = soc
+        soc = (upper + lower) / 2
+
+    return soc
 
 
 if __name__ == '__main__':
@@ -98,7 +115,7 @@ if __name__ == '__main__':
     TESTS = 400
     RESOLUTION = 400
     delta = 3600 / RESOLUTION  # 1 hour, split into RESOLUTION points
-    GRAPHS = False
+    GRAPHS = True
 
     sigma_i = 0
     sigma_v = 0
@@ -160,9 +177,18 @@ if __name__ == '__main__':
         # find the closest match to the sample curve
         guess_batt = find_curve(V, batteries)
 
+        k_error.append(percent_error(guess_batt['Vo'], target_battery['Vo']))
+
+        # estimate the soc of the battery at the given instantenous voltage and current
+        soc_est = []
+        for _Vo, _soc in zip(target_battery['Vo'], target_battery['zsoc']):
+            est = estimate_soc(V=_Vo, k=target_battery['k'])
+            soc_est.append(est)
+            soc_error.append(abs(est - _soc))
+
         # # plot the expected and actual curves for comparison (first one only)
         if (i == 0 and GRAPHS):
-            fig, ax = plt.subplots(2, 1, sharex=True)
+            fig, ax = plt.subplots(3, 1, sharex=True)
             ax[0].plot(Vnoisy, label='noisy loaded sample curve')
             ax[0].plot(target_battery['Vo'], label='correct OCV curve')
             ax[0].plot(V, label='load compensated curve')
@@ -171,15 +197,11 @@ if __name__ == '__main__':
             ax[0].set_title('Voltage Curves')
             ax[1].plot(Ibatt, label='noisy loaded sample curve')
             ax[1].set_title('Current Load')
+            ax[2].plot(soc_est, label='estimated soc')
+            ax[2].plot(target_battery['zsoc'], label='correct soc')
+            ax[2].legend()
+            ax[2].set_title('SOC')
             plt.show()
-
-        k_error.append(percent_error(guess_batt['Vo'], target_battery['Vo']))
-
-        # estimate the soc of the battery at the given instantenous voltage and current
-        position = np.random.randint(0, RESOLUTION)
-        soc_error.append(
-            abs(estimate_soc_instantaneous(V[position], I[position], target_battery['k'], R0=r0) - target_battery['zsoc'][position])
-        )
 
         bar.next()
 
