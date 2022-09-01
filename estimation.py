@@ -88,7 +88,7 @@ def estimate_soc(V: float,  k: iter, I: float = 0, R0: float = 0) -> float:
     ITERATIONS = 10
 
     def Vo(_soc: float) -> float:
-        # _soc = (1 - 2 * 0.175) * _soc / 1 + 0.175
+        _soc = (1 - 2 * 0.175) * _soc / 1 + 0.175
         return np.sum(
             np.array([1, 1 / _soc, 1 / _soc ** 2, 1 / _soc ** 3,
                      1 / _soc ** 4, _soc, np.log(_soc), np.log(1 - _soc)]) * k
