@@ -6,6 +6,18 @@ Initial meeting notes can be found [here](notes.md).
 
 Test dataset is available [here](https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830), from Carnegie Mellon University.
 
+## soc_estimation_rework branch
+
+- any and all soc handling needs to be standardized
+- Right now, some soc curves are stored, *scaled*. This needs to change, as graphs should show soc changing from 0 -> 1.
+
+#### Changes:
+
+- [ ] export forward and reverse scaling to its own script
+- [ ] migrate all scalings into imported calls
+- [ ] any and all soc curves being stored or represented need to scale from 0% to 100%, not 17.5% to 82.5%.
+- [ ] scaling should only happen immediately before something absolutely needs to be scaled, and changed back immediately after
+
 ## TODO
 
 - Curve fitting is not efficient as it is now, it will need to be redone eventually using least squares, rather than a cache.
