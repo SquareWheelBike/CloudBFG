@@ -6,6 +6,16 @@ Initial meeting notes can be found [here](notes.md).
 
 Test dataset is available [here](https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830), from Carnegie Mellon University.
 
+## SoC estimation algorithm
+
+This algorithm wasn't standardized at some point, but has been. The order of coefficients does not matter mathematically, but it does when dealing with k-parameters in VECTORS.
+
+```txt
+k0 + k1/s + k2/s^2 + k3/s^3 + k4/s^4 + k5 s + k6 ln(s) + k7 ln(1-s)
+```
+
+Where `s` is the state of charge, and `k0` through `k7` are the coefficients.
+
 ## soc_estimation_rework branch
 
 - any and all soc handling needs to be standardized
