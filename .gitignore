@@ -8,3 +8,4 @@ res/zsoc_curves
 res/*.zip
 res/dataset
 AESS*
+.vscode

@@ -6,6 +6,28 @@ Initial meeting notes can be found [here](notes.md).
 
 Test dataset is available [here](https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830), from Carnegie Mellon University.
 
+## SoC estimation algorithm
+
+This algorithm wasn't standardized at some point, but has been. The order of coefficients does not matter mathematically, but it does when dealing with k-parameters in VECTORS.
+
+```txt
+k0 + k1/s + k2/s^2 + k3/s^3 + k4/s^4 + k5 s + k6 ln(s) + k7 ln(1-s)
+```
+
+Where `s` is the state of charge, and `k0` through `k7` are the coefficients.
+
+## soc_estimation_rework branch
+
+- any and all soc handling needs to be standardized
+- Right now, some soc curves are stored, *scaled*. This needs to change, as graphs should show soc changing from 0 -> 1.
+
+#### Changes:
+
+- [ ] export forward and reverse scaling to its own script
+- [ ] migrate all scalings into imported calls
+- [ ] any and all soc curves being stored or represented need to scale from 0% to 100%, not 17.5% to 82.5%.
+- [ ] scaling should only happen immediately before something absolutely needs to be scaled, and changed back immediately after
+
 ## TODO
 
 - Curve fitting is not efficient as it is now, it will need to be redone eventually using least squares, rather than a cache.
