@@ -22,3 +22,5 @@
 *.docx binary
 *.pptx binary
 *.xls binary
+*.zip binary
+*.7z binary
