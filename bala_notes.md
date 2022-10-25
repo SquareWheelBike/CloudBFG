@@ -27,5 +27,3 @@ There were more points, I thought he moved  on to something else so I missed it;
 - we will also be stacking temperature data onto the NN, so we need to be clear about that
 - we need a more clearly defined use case
 - bala has a pitch that we can buy 10 different batteries with different characteristics, we will characterize all of them with bala's approach, and then 
-
-echo on wed at 1pm, windsor heart institute 2464 unit 201, bring a list of medications
