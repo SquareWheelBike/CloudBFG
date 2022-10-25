@@ -167,7 +167,7 @@ def OCV_curve(Kbatt: list, resolution: int = 100) -> dict:
     # NOTE: entry 12 is the NINTH k-parameter, but I am truncating it for now
     battery = {
         'k': np.array([float(x) for x in Kbatt[:8]]),
-        'R0': float(entry[8]) if len(Kbatt) > 8 else 0,
+        'R0': float(Kbatt[8]) if len(Kbatt) > 8 else 0,
         'zsoc': zsoc,
         'Vo': Vo
     }
