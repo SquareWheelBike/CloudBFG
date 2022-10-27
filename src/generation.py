@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 
+# DONT USE, DOESNT WORK
 def generate_k_parameters(cache: list, output: str = None, n: int = 1000) -> list:
     """
     Generate a dataset of plausible k-parameters, from the original set of 34 batteries. Keeps the original set, and just expands until we have n batteries.
