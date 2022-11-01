@@ -1,8 +1,9 @@
 numpy
 matplotlib
 progressbar2
-tensorflow-cpu
+tensorflow
 progress
 wget
 requests
 pandas
+perlin-noise
