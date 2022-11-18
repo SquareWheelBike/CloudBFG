@@ -85,3 +85,13 @@ There will be one master database, stored in MongoDB, which will contain all of 
 - There is a Pi Zero 2 W in the lab, we have taken it for now for testing purposes, but we should check with Bala to make sure it is okay to use.
 - I need the battery simulation code that he made, so that I can simulate stuff for testing.
 - Ask about records off of Arbin that we can use to construct a training database for the neural network.
+
+### Model 3 estimation parameters
+
+Ranges for generating more reali
+
+- R0: 10 - 500 m Ohm
+- R1: 100 - 200 m Ohm
+- R2: 100 - 200 m Ohm
+- C1: 5 - 500 F
+- C2: 5 - 500 F
