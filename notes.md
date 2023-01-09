@@ -20,8 +20,6 @@
   - The solution to this is to (probably) have separate 'topics' for cells vs packs, so that the microcontroller only needs to worry about SoC estimation on the *pack*, rather than on every single cell.
 - We are also going to need to come up with a naming nomenclature, so that we can easily serialize each data point
 
-## Actual Server 
-
 ## Nomenclature
 
 A minimum set of battery information on an initial device connection could be:
@@ -95,3 +93,17 @@ Ranges for generating more reali
 - R2: 100 - 200 m Ohm
 - C1: 5 - 500 F
 - C2: 5 - 500 F
+
+## Machine Learning
+
+### General Approach
+
+One approach you could take is to first represent each curve in your cache as a set of ordered points in the Cartesian plane. You could then represent your input curve in the same way. You could then use a machine learning model, such as a neural network, to predict the ordered set of points that represents the curve in the cache that is most similar to the input curve.
+
+To train the model, you would need to define a loss function that measures the difference between the predicted curve and the input curve. This loss function could be based on the Euclidean distance between the corresponding points on the two curves, possibly with some weights applied to give more or less importance to certain points.
+
+For example, you could define the loss function as the sum of the squared Euclidean distances between each pair of corresponding points, divided by the number of points in the curve. This would give you an average distance between the two curves.
+
+You could also consider using a loss function that takes into account the partial nature of the curves, for example by weighting points that are closer to the start or end of the curve more heavily, since these points may be more indicative of the overall shape of the curve.
+
+Once you have defined your loss function and trained your model, you can use it to predict the curve in the cache that is most similar to the input curve by minimizing the loss function.

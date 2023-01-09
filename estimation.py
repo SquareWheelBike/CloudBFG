@@ -1,3 +1,5 @@
+# performs an example of an estimation using hard-coded methods, such as least squares
+
 from src.tools import *
 import src.zsoc as zsoc
 import matplotlib.pyplot as plt
