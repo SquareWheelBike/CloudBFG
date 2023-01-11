@@ -1,7 +1,7 @@
 numpy
 matplotlib
 progressbar2
-tensorflow
+tensorflow-gpu
 progress
 wget
 requests

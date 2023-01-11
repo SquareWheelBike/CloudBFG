@@ -9,3 +9,5 @@ res/*.zip
 res/dataset
 AESS*
 .vscode
+.cache/
+.bash_history
